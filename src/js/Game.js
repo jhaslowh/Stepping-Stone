@@ -4,13 +4,12 @@
 var keyboard = {};
 var mouse = {x:0, y:0};
 
-// Handlers 
-var canvas = document.getElementById('game');
-var context = canvas.getContext('2d');
-
 // Game variables 
 var gameState = "playing";
 var level = new GameLevel();
+
+// Three.js variables 
+var renderer;
 
 // Beginning initialization 
 function init(){
@@ -21,8 +20,22 @@ function init(){
   //load assets
   loadResources();
   
+  // Window size 
+  //var WIDTH = window.innerWidth,
+  //      HEIGHT = window.innerHeight;
+  var WIDTH = 800,
+        HEIGHT = 600;
+        
   // Set up level 
-  level.init();
+  level.init(WIDTH,HEIGHT);
+
+  /** Setup renderer */
+  // Create Renderer
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(WIDTH, HEIGHT);
+  // Set the background color of the scene.
+  renderer.setClearColor(new THREE.Color(0xEEEEEE));
+  document.body.appendChild(renderer.domElement);
 }
 
 // Main Game loop 
@@ -32,7 +45,7 @@ function gameLoop()
   level.update();
   
   // Render
-  level.draw();
+  level.draw(renderer);
 }
 
 function addEvent(node, name, func) 
@@ -46,11 +59,12 @@ function addEvent(node, name, func)
 
 function addMouseEvents()
 {
-    addEvent(document, "mousedown", function(e){
+  // TODO this is broken and needs to be fixed 
+    /*addEvent(document, "mousedown", function(e){
         mouse = {
-			x:(e.clientX-canvas.getBoundingClientRect().left), 
-			y:(e.clientY-canvas.getBoundingClientRect().top)};
-    });
+			x:(e.clientX-renderer.getBoundingClientRect().left), 
+			y:(e.clientY-renderer.getBoundingClientRect().top)};
+    });*/
 }
 
 function addKeyboardEvents() 
