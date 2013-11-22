@@ -13,18 +13,14 @@ var renderer;
 
 // Beginning initialization 
 function init(){
-  //listen to keyboard events
-  addKeyboardEvents();
-  addMouseEvents();
-
+  initIO();
+  
   //load assets
   loadResources();
   
   // Window size 
-  //var WIDTH = window.innerWidth,
-  //      HEIGHT = window.innerHeight;
-  var WIDTH = 800,
-        HEIGHT = 600;
+  //var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+  var WIDTH = 800, HEIGHT = 600;
         
   // Set up level 
   level.init(WIDTH,HEIGHT);
@@ -35,6 +31,13 @@ function init(){
   renderer.setSize(WIDTH, HEIGHT);
   // Set the background color of the scene.
   renderer.setClearColor(new THREE.Color(0xEEEEEE));
+  // Shadows (dont know what all the values do yet)
+  renderer.gammaInput = true;
+  renderer.gammaOutput = true;
+  renderer.physicallyBasedShading = true;
+  renderer.shadowMapEnabled = true;
+  renderer.shadowMapCullFace = THREE.CullFaceBack;
+  
   document.body.appendChild(renderer.domElement);
 }
 
@@ -48,57 +51,12 @@ function gameLoop()
   level.draw(renderer);
 }
 
-function addEvent(node, name, func) 
-{
-  if(node.addEventListener) {
-    node.addEventListener(name, func, false);
-  } else if(node.attachEvent) {
-    node.attachEvent(name, func);
-  }
-}
-
-function addMouseEvents()
-{
-  // TODO this is broken and needs to be fixed 
-    /*addEvent(document, "mousedown", function(e){
-        mouse = {
-			x:(e.clientX-renderer.getBoundingClientRect().left), 
-			y:(e.clientY-renderer.getBoundingClientRect().top)};
-    });*/
-}
-
-function addKeyboardEvents() 
-{
-  addEvent(document, "keydown", function(e) 
-  {
-    keyboard[e.keyCode] = true;
-  });
-
-  addEvent(document, "keyup", function(e) 
-  {
-    keyboard[e.keyCode] = false;
-  });
-
-}
-
 // Play a sound file 
 function playSound(file) 
 {
   //var sound = document.createElement("audio");
   //sound.setAttribute("src", "sounds/" + file + ".mp3");
   //sound.play();
-}
-
-// Load out resources 
-function loadResources() 
-{
-  /*gun_image = new Image();
-  gun_image.src = 'images/gun.png';
-  
-  baby_sound = document.createElement("audio");
-  document.body.appendChild(baby_sound);
-  baby_sound.setAttribute("src", "sounds/baby.mp3");*/
-
 }
 
 //-----------------------------------------------------------------------------
