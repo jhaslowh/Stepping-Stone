@@ -89,14 +89,11 @@ GameLevel.prototype.init = function (w,h){
   
   /** Set up lights */
   // Hemisphere light
-  this.hem_light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-  this.hem_light.color.setHSL( 0.6, 1, 0.6 ); // TODO these values may need to be change, they were from an example 
-  this.hem_light.groundColor.setHSL( 0.095, 1, 0.75 );// TODO these values may need to be change, they were from an example 
+  this.hem_light = new THREE.HemisphereLight( 0x61D7FF, 0xffffff, 0.6 );
   this.scene.add( this.hem_light );
 
   // Directional light 
-  this.direct_light = new THREE.DirectionalLight( 0xffffff, 1 );
-  this.direct_light.color.setHSL( 0.1, 1, 0.95 );// TODO these values may need to be change, they were from an example 
+  this.direct_light = new THREE.DirectionalLight( 0xffffff, 1 ); 
   this.direct_light.castShadow = true;
   this.direct_light.shadowDarkness = 0.35;
   this.scene.add( this.direct_light );
