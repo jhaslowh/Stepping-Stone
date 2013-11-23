@@ -5,6 +5,14 @@ function Player(x,y){
   this.y = y;
   this.width = 50;
   this.height = 24;
+  this.mesh;
+}
+
+/** Initialize player values */
+Player.prototype.init = function(scene){
+  // TODO 
+  
+  // TODO make mesh and add it to scene
 }
 
 /** Update player state */

@@ -71,7 +71,10 @@ GameLevel.prototype.init = function (w,h){
   this.gen_min_y = -vert_blocks * 25;
   this.gen_max_y = vert_blocks * 25;
   
-  // TODO Need to generate starting terrain (probably 3 screens worth) 
+  // Need to generate starting terrain (probably 3 screens worth) 
+  this.generateChunk(this.scene);
+  this.generateChunk(this.scene);
+  this.generateChunk(this.scene);
   
   /** Set up water */
   this.water_level = h/2;
@@ -97,6 +100,9 @@ GameLevel.prototype.init = function (w,h){
   this.direct_light.castShadow = true;
   this.direct_light.shadowDarkness = 0.35;
   this.scene.add( this.direct_light );
+  
+  /** Other */
+  this.player.init(this.scene);
 
   /** TODO remove later, for now, test cube */
   this.cube = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
@@ -160,8 +166,20 @@ GameLevel.prototype.draw = function (renderer){
 }
 
 /** Generate a new chunk of terrain */
-GameLevel.prototype.generateChunk = function (){
+GameLevel.prototype.generateChunk = function (scene){
   // TODO 
+
+  //this.blocks[this.nextChunkIndex()] = new Block();
+}
+
+/** Get the index of the next available chunk */
+GameLevel.prototype.nextChunkIndex = function (){
+  var i;
+  for (i = 0; i < this.blocks.length; i++){
+    if (this.blocks[i] == null)
+      break;
+  }
+  return i;
 }
 
 /** Set the water level to the appropriate height */
