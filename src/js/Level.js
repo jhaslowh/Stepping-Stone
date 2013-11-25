@@ -43,7 +43,7 @@ GameLevel.prototype.init = function (w,h){
   this.camera_loc.y = (h/2);
   /* Set the camera z based on the screen width, 
    * so the whole level can be seen. */
-  this.camera_zoom = -((w/2)/Math.tan(22.5)); 
+  this.camera_zoom = -((h/2)/Math.tan(22.5)); 
   
   // Create Camera 
   this.camera = new THREE.PerspectiveCamera(
