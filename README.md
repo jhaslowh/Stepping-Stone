@@ -23,5 +23,8 @@ Contains the player objects and all code needed to make the player work.
 * three.js
 Necessary 3D library for the project. 
 
+---------
+Currently using 2 spaces for each tab, if this is a problem we an switch to 4 spaces per tab. 
+
 
 

@@ -33,6 +33,8 @@ function generateBlock(type, x, y){
     var mesh = new THREE.Mesh(c, material);
     mesh.position.x = x + (this.width / 2);
     mesh.position.y = y + (this.height / 2);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     return new Block(x,y,type,mesh);
   }
   else if (type == BlockType.Rock){
@@ -41,6 +43,8 @@ function generateBlock(type, x, y){
     var mesh = new THREE.Mesh(c, material);
     mesh.position.x = x + (this.width / 2);
     mesh.position.y = y + (this.height / 2);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     return new Block(x,y,type,mesh);
   }
   else if (type == BlockType.Sand){
@@ -49,6 +53,8 @@ function generateBlock(type, x, y){
     var mesh = new THREE.Mesh(c, material);
     mesh.position.x = x + (this.width / 2);
     mesh.position.y = y + (this.height / 2);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     return new Block(x,y,type,mesh);
   }
   
@@ -58,5 +64,7 @@ function generateBlock(type, x, y){
   var mesh = new THREE.Mesh(c, material);
   mesh.position.x = x + (this.width / 2);
   mesh.position.y = y + (this.height / 2);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
   return new Block(x,y,type,mesh);
 }

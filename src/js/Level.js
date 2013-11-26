@@ -14,7 +14,7 @@ function GameLevel(){
   
   // Rendering 
   this.camera;
-  this.camera_move_speed = 0; // The camera will move to the right, player must keep up
+  this.camera_move_speed = 0; // (TODO set) The camera will move to the right, player must keep up
   this.camera_loc = {x:0,y:0};
   this.camera_zoom = 0;
   this.camera_tilt = -20;
@@ -84,6 +84,8 @@ GameLevel.prototype.init = function (w,h){
   material.opacity = .25;
   material.transparent = true;
   this.water_cube = new THREE.Mesh(c, material);
+  this.water_cube.castShadow = true;
+  this.water_cube.receiveShadow = true;
   this.fix_water_level();
   this.scene.add(this.water_cube);
   
@@ -96,6 +98,8 @@ GameLevel.prototype.init = function (w,h){
   this.direct_light = new THREE.DirectionalLight( 0xffffff, 1 ); 
   this.direct_light.castShadow = true;
   this.direct_light.shadowDarkness = 0.35;
+  this.direct_light.shadowMapWidth = 2048;
+  this.direct_light.shadowMapHeight = 2048;
   this.scene.add( this.direct_light );
   
   /** Other */
@@ -105,6 +109,7 @@ GameLevel.prototype.init = function (w,h){
   this.cube = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
   this.cube.position.x = w/2;
   this.cube.position.y = h/2;
+  this.cube.castShadow = true;
   this.scene.add(this.cube);
 }
 
@@ -140,6 +145,7 @@ GameLevel.prototype.update = function(){
     if (this.camera_tilt > 89)
       this.camera_tilt = 89;
   }
+
 }
 
 /** Draw the level to the screen */
@@ -192,5 +198,6 @@ GameLevel.prototype.fix_water_loc = function(){
 /** Fix the light location based off of the camera */
 GameLevel.prototype.fix_light_loc = function(){
   this.hem_light.position.set( this.camera_loc.x, -500, 0 );
-  this.direct_light.position.set( this.camera_loc.x, -100, 0 );
+  this.direct_light.position.set( this.camera_loc.x, -400, -200 );
+  this.direct_light.target.position.set( this.camera_loc.x, 0, 0 );
 }
