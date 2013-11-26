@@ -4,9 +4,12 @@ CS 425 Final Project
 TODO Name
 ---------
 
-TODO Project description
+Project description
+--------------------
+TODO
 
-File Descriptions:
+File Descriptions
+-----------------
 
 * Game.js
 This is the main file for the game. It handles all of the I/O and also the game loop. 
@@ -23,7 +26,11 @@ Contains the player objects and all code needed to make the player work.
 * three.js
 Necessary 3D library for the project. 
 
----------
+* IO.js
+I/O File for the game. Handles keyboard and mouse. 
+
+Notes
+-----
 Currently using 2 spaces for each tab, if this is a problem we an switch to 4 spaces per tab. 
 
 
