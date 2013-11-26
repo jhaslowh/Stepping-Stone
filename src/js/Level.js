@@ -17,7 +17,7 @@ function GameLevel(){
   this.camera_move_speed = 0; // (TODO set) The camera will move to the right, player must keep up
   this.camera_loc = {x:0,y:0};
   this.camera_zoom = 0;
-  this.camera_tilt = -20;
+  this.camera_tilt = 0;
   this.camera_max_tilt = 50;  // This is tilt down
   this.camera_min_tilt = -89; // This is tilt up
   this.scene;
@@ -32,9 +32,6 @@ function GameLevel(){
   
   // Last correct path block placed 
   this.last_path_block;
-  
-  // TODO remove later
-  this.cube;
 }
 
 /** Initialize level */
@@ -42,10 +39,11 @@ GameLevel.prototype.init = function (w,h){
   /** Set up rendering Code */
   // Move camera to middle of level width and height 
   this.camera_loc.x = w/2;
-  this.camera_loc.y = (h/2);
+  this.camera_loc.y = h/2;
   /* Set the camera z based on the screen width, 
    * so the whole level can be seen. */
-  this.camera_zoom = -((h/2)/Math.tan(22.5)); 
+  //this.camera_zoom = -((h/2)/Math.tan(22.5)); 
+  this.camera_zoom = -((h/2) / Math.tan((Math.PI * 22.5)/180)); 
   
   // Create Camera 
   this.camera = new THREE.PerspectiveCamera(
@@ -107,38 +105,28 @@ GameLevel.prototype.init = function (w,h){
   /** Other */
   this.player.init(this.scene);
 
-  /** TODO remove later, for now, test cube */
-  this.cube = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
-  this.cube.position.x = w/2;
-  this.cube.position.y = h/2;
-  this.cube.castShadow = true;
-  this.scene.add(this.cube);
+  /** TODO corner cubes to mark correct screen corners  */
+  var cube1 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
+  cube1.position.x = 0;
+  cube1.position.y = 0;
+  this.scene.add(cube1);
+  var cube2 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
+  cube2.position.x = w;
+  cube2.position.y = 0;
+  this.scene.add(cube2);
+  var cube3 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
+  cube3.position.x = w;
+  cube3.position.y = h;
+  this.scene.add(cube3);
+  var cube4 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
+  cube4.position.x = 0;
+  cube4.position.y = h;
+  this.scene.add(cube4);
 }
 
 /** Update the state of the level */
 GameLevel.prototype.update = function(){
   // Update camera 
-  this.camera_loc.x += this.camera_move_speed;
-  this.fix_water_loc();
-  this.fix_light_loc();
-  
-  this.player.update();
-  
-  // TODO 
-  
-  // TODO remove
-  this.cube.rotation.y += .01;
-  this.cube.rotation.x += .01;
-  
-  if (keyboard[KEY_RIGHT])
-    this.cube.position.x += 2;
-  if (keyboard[KEY_LEFT])
-    this.cube.position.x -= 2;
-  if (keyboard[KEY_UP])
-    this.cube.position.y -= 2;
-  if (keyboard[KEY_DOWN])
-    this.cube.position.y += 2;
-  
   if (keyboard[KEY_Q]){
     this.camera_tilt -= 1;
     if (this.camera_tilt < this.camera_min_tilt)
@@ -149,7 +137,15 @@ GameLevel.prototype.update = function(){
     if (this.camera_tilt > this.camera_max_tilt)
       this.camera_tilt = this.camera_max_tilt;
   }
-
+  
+  this.camera_loc.x += this.camera_move_speed;
+  this.fix_water_loc();
+  this.fix_light_loc();
+  
+  // Update Player
+  this.player.update();
+  
+  // TODO update blocks 
 }
 
 /** Draw the level to the screen */
@@ -208,20 +204,20 @@ GameLevel.prototype.fix_light_loc = function(){
 
 /** Get the x value of the left side of the level */
 GameLevel.prototype.level_left = function(){
-  // TODO 
+  return this.camera_loc.x - (this.level_width/2);
 }
 
 /** Get the x value of the right side of the level */
 GameLevel.prototype.level_right = function(){
-  // TODO 
+  return this.camera_loc.x + (this.level_width/2);
 }
 
 /** Get the y value of the bottom of the level */
 GameLevel.prototype.level_bottom = function(){
-  // TODO 
+  return this.camera_loc.y + (this.level_height/2);
 }
 
 /** Get the y value of the top of the level */
 GameLevel.prototype.level_top = function(){
-  // TODO 
+  return this.camera_loc.y - (this.level_height/2);
 }
