@@ -19,8 +19,8 @@ function init(){
   loadResources();
   
   // Window size 
-  //var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
-  var WIDTH = 800, HEIGHT = 600;
+  var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+  //var WIDTH = 800, HEIGHT = 600;
         
   // Set up level 
   level.init(WIDTH,HEIGHT);

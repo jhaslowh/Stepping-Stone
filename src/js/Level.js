@@ -18,6 +18,8 @@ function GameLevel(){
   this.camera_loc = {x:0,y:0};
   this.camera_zoom = 0;
   this.camera_tilt = -20;
+  this.camera_max_tilt = 50;  // This is tilt down
+  this.camera_min_tilt = -89; // This is tilt up
   this.scene;
   
   // Generation variables 
@@ -78,8 +80,8 @@ GameLevel.prototype.init = function (w,h){
   
   /** Set up water */
   this.water_level = h/2;
-  // Water shape for now will be the width plus 200, half the height plus 50, and 160 depth. 
-  var c = new THREE.CubeGeometry( w + 200, (h/2) + 50, 160); 
+  // Water shape for now will be the width plus 200, 1000 height, and 160 depth. 
+  var c = new THREE.CubeGeometry( w + 200, 1000, 160); 
   var material = new THREE.MeshLambertMaterial( { color: 0x00CAFC} );
   material.opacity = .25;
   material.transparent = true;
@@ -120,6 +122,8 @@ GameLevel.prototype.update = function(){
   this.fix_water_loc();
   this.fix_light_loc();
   
+  this.player.update();
+  
   // TODO 
   
   // TODO remove
@@ -135,15 +139,15 @@ GameLevel.prototype.update = function(){
   if (keyboard[KEY_DOWN])
     this.cube.position.y += 2;
   
-  if (keyboard[KEY_W]){
+  if (keyboard[KEY_Q]){
     this.camera_tilt -= 1;
-    if (this.camera_tilt < -89)
-      this.camera_tilt = -89;
+    if (this.camera_tilt < this.camera_min_tilt)
+      this.camera_tilt = this.camera_min_tilt;
   }
-  if (keyboard[KEY_S]){
+  if (keyboard[KEY_E]){
     this.camera_tilt += 1;
-    if (this.camera_tilt > 89)
-      this.camera_tilt = 89;
+    if (this.camera_tilt > this.camera_max_tilt)
+      this.camera_tilt = this.camera_max_tilt;
   }
 
 }
@@ -200,4 +204,24 @@ GameLevel.prototype.fix_light_loc = function(){
   this.hem_light.position.set( this.camera_loc.x, -500, 0 );
   this.direct_light.position.set( this.camera_loc.x, -400, -200 );
   this.direct_light.target.position.set( this.camera_loc.x, 0, 0 );
+}
+
+/** Get the x value of the left side of the level */
+GameLevel.prototype.level_left = function(){
+  // TODO 
+}
+
+/** Get the x value of the right side of the level */
+GameLevel.prototype.level_right = function(){
+  // TODO 
+}
+
+/** Get the y value of the bottom of the level */
+GameLevel.prototype.level_bottom = function(){
+  // TODO 
+}
+
+/** Get the y value of the top of the level */
+GameLevel.prototype.level_top = function(){
+  // TODO 
 }
