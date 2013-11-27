@@ -4,12 +4,11 @@ CS 425 Final Project
 TODO Name
 ---------
 
-Project description
---------------------
+**Project description**
+
 TODO
 
-File Descriptions
------------------
+**File Descriptions**
 
 * Game.js
 This is the main file for the game. It handles all of the I/O and also the game loop. 
@@ -29,9 +28,16 @@ Necessary 3D library for the project.
 * IO.js
 I/O File for the game. Handles keyboard and mouse. 
 
-Notes
------
+**Controls**
+
+AWSD  : Move the player
+Q & E : Rotate the camera 
+
+**Notes**
+
 Currently using 2 spaces for each tab, if this is a problem we an switch to 4 spaces per tab. 
+
+
 
 
 
