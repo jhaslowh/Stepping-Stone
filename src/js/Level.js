@@ -96,8 +96,8 @@ GameLevel.prototype.init = function (w,h){
   this.fix_water_level();
   
   /** Set up sea floor */
+  material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xb88854, specular: 0x333333, shininess: 0, metal: false });
   c = new THREE.CubeGeometry(this.water_size, 50, 160);
-  material = new THREE.MeshPhongMaterial({ ambient: 0x552811, color: 0xb88854, specular: 0x333333, shininess: 25, metal: false });
   this.sea_floor = new THREE.Mesh(c, material);
   this.sea_floor.receiveShadow = true;
   this.sea_floor.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);

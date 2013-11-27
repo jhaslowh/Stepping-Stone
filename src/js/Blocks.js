@@ -47,7 +47,7 @@ function generateBlock(type, x, y){
     var mapHeight = THREE.ImageUtils.loadTexture( 'res/rock.png' );
     mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
     mapHeight.format = THREE.RGBFormat;
-    material = new THREE.MeshPhongMaterial({ ambient: 0x552811, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 19, metal: false });
+    material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
     var cube = new THREE.CubeGeometry( 25,25,25); 
     var mesh = new THREE.Mesh(cube, material);
     mesh.position.x = x + 12;
