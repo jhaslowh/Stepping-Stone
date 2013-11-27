@@ -50,8 +50,11 @@ function generateBlock(type, x, y){
     return new Block(x,y,type,mesh);
   }
   else if (type == BlockType.Rock){
+    var mapHeight = THREE.ImageUtils.loadTexture( 'res/rock.png' );
+    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+    mapHeight.format = THREE.RGBFormat;
+    material = new THREE.MeshPhongMaterial({ ambient: 0x552811, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 19, metal: false });
     var cube = new THREE.CubeGeometry( 25,25,25); 
-    var material = new THREE.MeshLambertMaterial( { color: 0x737980} );
     var mesh = new THREE.Mesh(cube, material);
     mesh.position.x = x + 12;
     mesh.position.y = y + 12;

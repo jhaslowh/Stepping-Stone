@@ -97,7 +97,7 @@ GameLevel.prototype.init = function (w,h){
   
   /** Set up sea floor */
   c = new THREE.CubeGeometry(this.water_size, 50, 160);
-  material = new THREE.MeshLambertMaterial({color: 0xb88854});
+  material = new THREE.MeshPhongMaterial({ ambient: 0x552811, color: 0xb88854, specular: 0x333333, shininess: 25, metal: false });
   this.sea_floor = new THREE.Mesh(c, material);
   this.sea_floor.receiveShadow = true;
   this.sea_floor.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
@@ -189,18 +189,26 @@ GameLevel.prototype.generateChunk = function (scene){
   //this.blocks[this.nextChunkIndex()] = new Block();
   
   // Test Blocks 
+  /*for (var i = 0; i < this.vert_blocks; i++){
+    for (var j = 0; j < this.hor_blocks; j++){
+      var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top+( j * 25)).mesh;
+      this.scene.add(mesh);
+    }
+  }*/
+  
   for (var i = 0; i < this.vert_blocks; i++){
-    var mesh = generateBlock(BlockType.Path, i * 25,this.gen_top+( i * 25)).mesh;
+    var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top+( i * 25)).mesh;
     this.scene.add(mesh);
-    mesh = generateBlock(BlockType.Path, 0,this.gen_top + (i * 25)).mesh;
+    mesh = generateBlock(BlockType.Rock, 0,this.gen_top + (i * 25)).mesh;
     this.scene.add(mesh);
   }
   
   for (var i = 0; i < this.hor_blocks; i++){
-    var mesh = generateBlock(BlockType.Path, i * 25,this.gen_top).mesh;
+    var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top).mesh;
     this.scene.add(mesh);
   }
 }
+
 
 /** Get the index of the next available chunk */
 GameLevel.prototype.nextChunkIndex = function (){
