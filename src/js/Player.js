@@ -10,7 +10,6 @@ function Player(){
   this.h = 24;
   this.speed = 5;
   this.mesh;
-  this.distance_stat = 0;
   
   // Physics 
   this.jumpt = 0;
@@ -141,7 +140,7 @@ Player.prototype.checkCollision = function(level){
   // Level collision
   if (this.ny + this.h > level.level_bottom()){
     //this.mesh.position.y = level.level_bottom() - this.h;
-    this.pass_x = false;
+    this.pass_y = false;
   }
   else if (this.ny < level.level_top()){
     //this.mesh.position.y = level.level_top();
@@ -159,10 +158,8 @@ Player.prototype.checkCollision = function(level){
 /** Collision Response code */
 Player.prototype.collisionResponse = function(){
   // If locations passed, fix them 
-  if (this.pass_x){
-    this.distance_stat += this.nx - this.mesh.position.x;
+  if (this.pass_x)
     this.mesh.position.x = this.nx;
-  }
   
   if (this.pass_y)
     this.mesh.position.y = this.ny;
