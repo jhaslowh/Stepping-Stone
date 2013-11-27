@@ -1,3 +1,6 @@
+var GRAVITY = 980;
+var SINK_SPEED = 10;
+
 /** Player Structure */
 function Player(){ 
   // Location of player 
@@ -7,13 +10,29 @@ function Player(){
   this.h = 24;
   this.speed = 5;
   this.mesh;
+  this.distance_stat = 0;
+  
+  // Physics 
+  this.jumpt = 0;
+  this.yo = 0;
+  this.air_t = 0;
+  this.jumpTime = .35;
+	this.minAirtForInAir = .02;
+  
+  // States 
+  this.alive = true;
+  this.jumping = false;
+  this.inAir = false;
+  this.pass_x = true;
+  this.pass_y = true;
+  this.in_water = false;
 }
 
 /** Initialize player values */
 Player.prototype.init = function(level){
   // Make mesh and add it to scene
   var cube = new THREE.Geometry(); 
-  var material = new THREE.MeshLambertMaterial( { color: 0xff1818} );
+  var material = new THREE.MeshPhongMaterial({color: 0xff1818,shininess: 20, metal: true });
   
   // Make vertices 
   cube.vertices.push(new THREE.Vector3(0,0,12));
@@ -32,7 +51,7 @@ Player.prototype.init = function(level){
   
   this.mesh = new THREE.Mesh(cube, material);
   this.mesh.position.x = level.screen_width/2; 
-  this.mesh.position.y = level.screen_height/2; 
+  this.mesh.position.y = level.water_level; 
   this.mesh.castShadow = true;
   this.mesh.receiveShadow = true;
   level.scene.add(this.mesh);
@@ -40,45 +59,148 @@ Player.prototype.init = function(level){
 
 /** Update player state */
 Player.prototype.update = function(level){
-  /** Update Location */
-  // Grab location 
-  this.nx = this.mesh.position.x;
-  this.ny = this.mesh.position.y;
-  
-  // Update position
-  if (keyboard[KEY_D])
-    this.nx += this.speed;
-  if (keyboard[KEY_A])
-    this.nx -= this.speed;
-  if (keyboard[KEY_W])
-    this.ny -= this.speed;
-  if (keyboard[KEY_S])
-    this.ny += this.speed;
+  if (this.alive){
+    /** Update Location */
+    // Grab location 
+    this.nx = this.mesh.position.x;
+    this.ny = this.mesh.position.y;
     
-  // TODO replace the above with better physics 
-  /*
-  if (player is above water line or on water line){
+    // If player is sitting on or above the water
+    if (this.ny <= level.water_level- (this.h/2) ){
+      this.in_water = false;
+      
+      // Update controls 
+      if (keyboard[KEY_D])
+        this.nx += this.speed;
+      if (keyboard[KEY_A])
+        this.nx -= this.speed;
+      if (keyboard[KEY_W]){
+        // See if player can jump 
+        if (!this.jumping && !this.inAir){
+          // Set up physics 
+          this.jumpt = this.jumpTime;
+          this.airt = 0;
+          this.yo = this.ny;
+          
+          // Set states 
+          this.jumping = true;
+          this.inAir = true;
+        }
+      }
+        
+      // Gravity 
+      if (!this.jumping){
+        this.air_t += time_step;
+        this.ny = this.yo + (.5 * GRAVITY * (this.air_t * this.air_t));
+      }
+      // If jumping 
+      else {
+        // This equation must be used to get a smooth jump curve
+				this.ny = this.yo 							// Starting loc 
+						- (.5 * GRAVITY * (this.jumpTime * this.jumpTime)) // Add max jump
+						+ (.5 * GRAVITY * (this.jumpt * this.jumpt));		// Minus curve value 
+				this.jumpt -= time_step;
+        
+        if (this.jumpt < 0){
+          this.stopJump();
+        }
+      }
+    }
+    // If player is below the water 
+    else if (this.ny > level.water_level- (this.h/2) ){
+      this.in_water = true;
+      
+      // Update controls 
+      if (keyboard[KEY_D])
+        this.nx += this.speed;
+      if (keyboard[KEY_A])
+        this.nx -= this.speed;
+      if (keyboard[KEY_S])
+        this.ny += this.speed;
+      if (keyboard[KEY_W])
+        this.ny -= this.speed;
+        
+      // Water gravity 
+      this.ny += SINK_SPEED * time_step;
+    }
+      
+    /** Check collision */
+    this.checkCollision(level);
     
-  
-  }else if (player is below line){
-  
+    /** Collision Response */
+    this.collisionResponse();
   }
-  */
-    
-  /** Check collision */
-  var checkx = true;
-  var checky = true;
+}
+
+/** Check player collision with other obstacles */
+Player.prototype.checkCollision = function(level){
+  // Reset our checks 
+  this.pass_x = true;
+  this.pass_y = true;
   
   // Level collision
   if (this.ny + this.h > level.level_bottom()){
-    this.ny = level.level_bottom() - this.h;
-    checky = false;
+    //this.mesh.position.y = level.level_bottom() - this.h;
+    this.pass_x = false;
+  }
+  else if (this.ny < level.level_top()){
+    //this.mesh.position.y = level.level_top();
+    this.pass_y = false;
   }
   
-    
-  // TODO block Collision
+  // Check if the player was above water and lands in it
+  if (this.in_water == false && this.ny > level.water_level - (this.h/2)){
+    this.hitGround();
+  }
   
-  /** Collision Response */
-  this.mesh.position.x = this.nx;
-  this.mesh.position.y = this.ny;
+  // TODO block Collision
+}
+
+/** Collision Response code */
+Player.prototype.collisionResponse = function(){
+  // If locations passed, fix them 
+  if (this.pass_x){
+    this.distance_stat += this.nx - this.mesh.position.x;
+    this.mesh.position.x = this.nx;
+  }
+  
+  if (this.pass_y)
+    this.mesh.position.y = this.ny;
+    
+  // Stop jump if hits wall 
+  if ((!this.pass_x || !this.pass_y) && this.jumping)
+    this.stopJump();
+    
+  // Air check 
+  if (this.air_t > this.minAirtForInAir)
+    this.inAir = true;
+    
+  // TODO Do death checks 
+}
+
+/** Stop player if they are jumping*/
+Player.prototype.stopJump = function(){
+  this.jumping = false;
+  this.air_t = 0;
+  this.yo = this.mesh.position.y;
+}
+
+/** Call when the player hits the ground **/
+Player.prototype.hitGround = function(){
+  this.air_t = 0;
+  this.yo = this.mesh.position.y;
+  this.inAir = false;
+  this.jumping = false;
+}
+
+/** Check block collision on x axis **/
+Player.prototype.checkBlockX = function(block){
+  // TODO 
+  return false;
+}
+
+/** Check block collision on y axis **/
+Player.prototype.checkBlockY = function(block){
+  // TODO 
+  return false;
 }

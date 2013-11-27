@@ -29,12 +29,6 @@ Block.prototype.update = function(level){
   // TODO 
 }
 
-/** Check collision with player */
-Block.prototype.collides = function(player){
-  // TODO 
-  return false;
-}
-
 /** Return a block for the given type */
 function generateBlock(type, x, y){
   if (type == BlockType.Path){

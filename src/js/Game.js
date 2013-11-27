@@ -7,6 +7,7 @@ var mouse = {x:0, y:0};
 // Game variables 
 var gameState = "playing";
 var level = new GameLevel();
+var time_step = .016;
 
 // Three.js variables 
 var renderer;
