@@ -18,15 +18,19 @@ function Block(x,y,type, mesh){
 
 /** Block type list */
 var BlockType = { 
-  "NoBlock": -1,
-  "Path": 0, //(used for the correct block path for the player, should not be drawn)
-  "Rock": 1, 
-  "Sand": 2 
+  "NoBlock": 0,
+  "Path": 1, //(used for the correct block path for the player, should not be drawn)
+  "Rock": 2, 
+  "Sand": 3 
 };
 
 /** Update block */
 Block.prototype.update = function(level){
-  // TODO 
+  // Check if block is off screen. 
+  if (this.mesh.position.x < level.level_left() - 100){
+    level.scene.remove(this.mesh);
+    this.active = false;
+  }
 }
 
 /** Return a block for the given type */

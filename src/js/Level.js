@@ -6,36 +6,40 @@ function GameLevel(){
   // Player
   this.player = new Player();
   // Water
-  this.water_cube;
-  this.water_level;
-  this.water_size = 0;
-  this.sea_floor; 
+  this.water_cube;            // Mesh for water. 
+  this.water_level;           // Y value for sea level. set in init()
+  this.water_size = 0;        // Width for water and sea floor. set in init()
+  this.sea_floor;             // Sea floor mesh, created in init()
   // Lights
-  this.hem_light;
+  this.hem_light;             
   this.direct_light;
   
   // Rendering 
   this.camera;
-  this.camera_move_speed = 0; // (TODO set) The camera will move to the right, player must keep up
-  this.camera_loc = {x:0,y:0};
-  this.camera_zoom = 0;
-  this.camera_tilt = 0;
+  this.camera_move_speed = 1; // (TODO set) The camera will move to the right, player must keep up
+  this.camera_loc = {x:0,y:0};// Current camera location. Controled by level
+  this.camera_zoom = 0;       // Zoom for camera, auto calculated. 
+  this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
   this.camera_max_tilt = 35;  // This is tilt down
   this.camera_min_tilt = -15; // This is tilt up
-  this.scene;
+  this.scene;                 // Scene to hold all geometry 
   
   // Generation variables 
   // All these values will be set in init()
   this.next_gen_loc = 0; // Starting x value for next chunk of generated land 
-  this.vert_blocks = 0;
-  this.hor_blocks = 0;
-  this.gen_top = 0;
-  this.gen_bottom = 0;
-  this.screen_width = 0;
-  this.screen_height = 0;
+  this.vert_blocks = 0;  // Number of vertical blocks per chunk
+  this.hor_blocks = 0;   // Number of horozontal blocks per chunk
+  this.gen_top = 0;      // Top of generation range 
+  this.gen_bottom = 0;   // Bottom of generation range (bottom box y value plus height)
+  this.screen_width = 0; // Width of screen 
+  this.screen_height = 0;// height of screen 
+  this.block_list_full = false; // used in index method to make it faster 
   // Row of last path block placed 
-  this.last_path_block; 
+  this.last_path_block = -1;  // Last y index value in grid for path generation 
+  this.grid_water_level = 0;  // Where in the grid the water level is 
   
+  // TODO remove
+  this.test_cube;
 }
 
 /** Initialize level */
@@ -46,7 +50,6 @@ GameLevel.prototype.init = function (w,h){
   this.camera_loc.y = h/2;
   /* Set the camera z based on the screen width, 
    * so the whole level can be seen. */
-  //this.camera_zoom = -((h/2)/Math.tan(22.5)); 
   this.camera_zoom = -((h/2) / Math.tan((Math.PI * 22.5)/180)); 
   
   // Create Camera 
@@ -75,11 +78,10 @@ GameLevel.prototype.init = function (w,h){
   this.hor_blocks = Math.round((w/ 25));
   this.gen_top = (h/2) - ((this.vert_blocks * 25)/2);
   this.gen_bottom = (h/2) + ((this.vert_blocks * 25)/2);
+  this.last_path_block = Math.round(this.vert_blocks/2) + 1;
   
   // Need to generate starting terrain (probably 3 screens worth) 
-  this.generateChunk(this.scene);
-  this.generateChunk(this.scene);
-  this.generateChunk(this.scene);
+  this.generateChunk();
   
   /** Set up water */
   this.water_level = h/2;
@@ -119,23 +121,20 @@ GameLevel.prototype.init = function (w,h){
   /** Other */
   this.player.init(this);
 
-  /** TODO corner cubes to mark correct screen corners  */
-  var cube1 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
-  cube1.position.x = 0;
-  cube1.position.y = 0;
-  this.scene.add(cube1);
-  var cube2 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
-  cube2.position.x = w;
-  cube2.position.y = 0;
-  this.scene.add(cube2);
-  var cube3 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
-  cube3.position.x = w;
-  cube3.position.y = h;
-  this.scene.add(cube3);
-  var cube4 = new THREE.Mesh( new THREE.CubeGeometry( 25,25,25 ), new THREE.MeshNormalMaterial() );
-  cube4.position.x = 0;
-  cube4.position.y = h;
-  this.scene.add(cube4);
+  /** TODO test stuff  */
+  
+  var mapHeight = THREE.ImageUtils.loadTexture( 'res/test2.png' );
+  mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+  mapHeight.format = THREE.RGBFormat;
+  material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: true });
+  var cube = new THREE.CubeGeometry( 250,250,250); 
+  var mesh = new THREE.Mesh(cube, material);
+  mesh.position.x = w/2;
+  mesh.position.y = h/2;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  this.test_cube = mesh;
+  //this.scene.add(mesh);
 }
 
 /** Update the state of the level */
@@ -159,7 +158,17 @@ GameLevel.prototype.update = function(){
   // Update Player
   this.player.update(this);
   
-  // TODO update blocks 
+  // Update blocks 
+  for (var i = 0; i < this.blocks.length; i++)
+    this.blocks[i].update(this);
+    
+  // Block generation 
+  if (this.camera_loc.x + this.screen_width > this.next_gen_loc)
+    this.generateChunk();
+    
+  // TODO remove
+  this.test_cube.rotation.x += .01;
+  this.test_cube.rotation.y += .01;
 }
 
 /** Draw the level to the screen */
@@ -176,32 +185,92 @@ GameLevel.prototype.draw = function (renderer){
   this.camera.position.set( cam_loc.x, cam_loc.y, cam_loc.z );
   this.camera.lookAt(new THREE.Vector3(this.camera_loc.x,this.camera_loc.y,0));
   
-  // TODO 
-  
   // Draw scene 
   renderer.render( this.scene, this.camera );
 }
 
 /** Generate a new chunk of terrain */
-GameLevel.prototype.generateChunk = function (scene){
-  // TODO 
-
-  //this.blocks[this.nextChunkIndex()] = new Block();
+GameLevel.prototype.generateChunk = function (){
+  // Temporary grid to store blocks 
+  var block_grid = [this.hor_blocks];
+  // Create block grid 
+  for (var i = 0; i < this.hor_blocks; i++){
+    block_grid[i] = [this.vert_blocks];
+    for (var j = 0; j < this.vert_blocks; j++)
+      block_grid[i][j] = BlockType.NoBlock;
+  }
   
-  // Test Blocks 
-  /*for (var i = 0; i < this.vert_blocks; i++){
-    for (var j = 0; j < this.hor_blocks; j++){
-      var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top+( j * 25)).mesh;
-      this.scene.add(mesh);
+  /** Generate correct path */
+  var direction = -1;
+  /* 0 = Up
+   * 1 = Right
+   * 2 = Down */
+  for (var i = 0; i < this.hor_blocks - 1; i++){
+    // Get next direction for path
+    if (this.last_path_block == 0)
+      direction = Math.round(Math.random()) + 1;
+    else if (this.last_path_block == this.vert_blocks - 1)
+      direction = Math.round(Math.random());
+    else
+      direction = Math.round(Math.random() * 2)
+    
+    if (direction == 0){
+      // Front two blocks 
+      block_grid[i][this.last_path_block] = BlockType.Path;
+      block_grid[i+1][this.last_path_block] = BlockType.Path;
+      // Top two blocks 
+      block_grid[i][this.last_path_block-1] = BlockType.Path;
+      block_grid[i+1][this.last_path_block-1] = BlockType.Path;
+      
+      // Move path block up 
+      this.last_path_block -= 1;
+    } else if(direction == 1){
+      // Front block
+      block_grid[i][this.last_path_block] = BlockType.Path;
+    } else if(direction == 2){
+      // Front two blocks 
+      block_grid[i][this.last_path_block] = BlockType.Path;
+      block_grid[i+1][this.last_path_block] = BlockType.Path;
+      // Top two blocks 
+      block_grid[i][this.last_path_block+1] = BlockType.Path;
+      block_grid[i+1][this.last_path_block+1] = BlockType.Path;
+      
+      // Move path block up 
+      this.last_path_block += 1;
     }
-  }*/
+  }
+  block_grid[this.hor_blocks-1][this.last_path_block] = BlockType.Path;
   
-  for (var i = 0; i < this.vert_blocks; i++){
-    var block = generateBlock(BlockType.Rock, i * 25,this.gen_top+( i * 25))
+  /** Generate obstacles */
+  
+  
+  /** Convert grid to real blocks */
+  // Reset list state 
+  this.block_list_full = false;
+  
+  // Add blocks from grid into list 
+  for (var i = 0; i < this.hor_blocks; i++){
+    for (var j = 0; j < this.vert_blocks; j++){
+      if (block_grid[i][j] !== BlockType.NoBlock){
+        var index = this.nextChunkIndex();
+        var block = generateBlock(block_grid[i][j], 
+            this.next_gen_loc +(i * 25), this.gen_top + ( j * 25));
+        this.blocks[index] = block;
+        this.scene.add(block.mesh);
+      }
+    }
+  }
+  
+  // Move next gen spot 
+  this.next_gen_loc += this.hor_blocks * 25;
+  
+  // Test Blocks (only keeping for size testing and reference. )
+  /*for (var i = 0; i < this.vert_blocks; i++){
+    var block = generateBlock(BlockType.Rock, i * 25,this.gen_top+( i * 25));
     this.blocks.push(block);
     var mesh = block.mesh;
     this.scene.add(mesh);
-    var block = generateBlock(BlockType.Rock, 0,this.gen_top+( i * 25))
+    var block = generateBlock(BlockType.Rock, 0,this.gen_top+( i * 25));
     mesh = block.mesh;
     this.blocks.push(block);
     this.scene.add(mesh);
@@ -210,19 +279,22 @@ GameLevel.prototype.generateChunk = function (scene){
   for (var i = 0; i < this.hor_blocks; i++){
     var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top).mesh;
     this.scene.add(mesh);
-  }
+  }*/
 }
 
 
 /** Get the index of the next available chunk */
 GameLevel.prototype.nextChunkIndex = function (){
-  var i;
-  // Go through block list and find first dead block
-  for (i = 0; i < this.blocks.length; i++){
-    if (!this.blocks[i].active)
-      break;
+  var i = this.blocks.length;
+  if (!this.block_list_full){
+    // Go through block list and find first dead block
+    for (i = 0; i < this.blocks.length; i++){
+      if (!this.blocks[i].active)
+        return i;
+    }
   }
   // If no block found, return end of list 
+  this.block_list_full = true;
   return i;
 }
 
