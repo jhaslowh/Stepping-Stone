@@ -33,9 +33,9 @@ function GameLevel(){
   this.gen_bottom = 0;
   this.screen_width = 0;
   this.screen_height = 0;
+  // Row of last path block placed 
+  this.last_path_block; 
   
-  // Last correct path block placed 
-  this.last_path_block;
 }
 
 /** Initialize level */
@@ -197,9 +197,13 @@ GameLevel.prototype.generateChunk = function (scene){
   }*/
   
   for (var i = 0; i < this.vert_blocks; i++){
-    var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top+( i * 25)).mesh;
+    var block = generateBlock(BlockType.Rock, i * 25,this.gen_top+( i * 25))
+    this.blocks.push(block);
+    var mesh = block.mesh;
     this.scene.add(mesh);
-    mesh = generateBlock(BlockType.Rock, 0,this.gen_top + (i * 25)).mesh;
+    var block = generateBlock(BlockType.Rock, 0,this.gen_top+( i * 25))
+    mesh = block.mesh;
+    this.blocks.push(block);
     this.scene.add(mesh);
   }
   
@@ -213,10 +217,12 @@ GameLevel.prototype.generateChunk = function (scene){
 /** Get the index of the next available chunk */
 GameLevel.prototype.nextChunkIndex = function (){
   var i;
+  // Go through block list and find first dead block
   for (i = 0; i < this.blocks.length; i++){
-    if (this.blocks[i] == null)
+    if (!this.blocks[i].active)
       break;
   }
+  // If no block found, return end of list 
   return i;
 }
 

@@ -152,7 +152,25 @@ Player.prototype.checkCollision = function(level){
     this.hitGround();
   }
   
-  // TODO block Collision
+  // Block collision checks
+  for (var i = 0; i < level.blocks.length; i++){
+    // Make sure block is alive and not null
+    if (level.blocks[i].active && level.blocks[i].collides){
+      // x axis collision check 
+      if (this.checkBlockX(level.blocks[i])){
+        this.pass_x = false;
+      }
+      
+      // y axis collision check 
+      if (this.checkBlockY(level.blocks[i])){
+        // Might need this
+        // this.mesh.position.y = level.blocks[i].y - this.h;
+        
+        this.hitGround();
+        this.pass_y = false;
+      }
+    }
+  }
 }
 
 /** Collision Response code */
@@ -192,12 +210,16 @@ Player.prototype.hitGround = function(){
 
 /** Check block collision on x axis **/
 Player.prototype.checkBlockX = function(block){
-  // TODO 
-  return false;
+  return !((block.y + block.height) < this.mesh.position.y ||
+    block.y > (this.mesh.position.y + this.h) ||
+    (block.x + block.width) < this.nx ||
+    block.x > (this.nx + this.w));
 }
 
 /** Check block collision on y axis **/
 Player.prototype.checkBlockY = function(block){
-  // TODO 
-  return false;
+  return !((block.y + block.height) < this.ny ||
+    block.y > (this.ny + this.h) ||
+    (block.x + block.width) < this.mesh.position.x ||
+    block.x > (this.mesh.position.x + this.w));
 }
