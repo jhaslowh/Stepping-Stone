@@ -78,7 +78,8 @@ GameLevel.prototype.init = function (w,h){
   this.hor_blocks = Math.round((w/ 25));
   this.gen_top = (h/2) - ((this.vert_blocks * 25)/2);
   this.gen_bottom = (h/2) + ((this.vert_blocks * 25)/2);
-  this.last_path_block = Math.round(this.vert_blocks/2) + 1;
+  this.grid_water_level = Math.round(this.vert_blocks/2);
+  this.last_path_block = this.grid_water_level + 1;
   
   // Need to generate starting terrain (probably 3 screens worth) 
   this.generateChunk();
@@ -114,15 +115,24 @@ GameLevel.prototype.init = function (w,h){
   this.direct_light = new THREE.DirectionalLight( 0xffffff, 1 ); 
   this.direct_light.castShadow = true;
   this.direct_light.shadowDarkness = 0.35;
+  // Changing this makes the shadows have more detail 
   this.direct_light.shadowMapWidth = 2048;
   this.direct_light.shadowMapHeight = 2048;
+  this.direct_light.shadowCameraNear = 2;
+  this.direct_light.shadowCameraFar = 5000;
+  // This is the size of the area the shadow will cover 
+  var shadow_box_size = ((w/2)+150);
+  this.direct_light.shadowCameraLeft = -shadow_box_size;
+  this.direct_light.shadowCameraRight = shadow_box_size;
+  this.direct_light.shadowCameraTop = shadow_box_size;
+  this.direct_light.shadowCameraBottom = -shadow_box_size;
+  //this.direct_light.shadowCameraVisible = true; // Use this for debugging shadows 
   this.scene.add( this.direct_light );
   
   /** Other */
   this.player.init(this);
 
   /** TODO test stuff  */
-  
   var mapHeight = THREE.ImageUtils.loadTexture( 'res/test2.png' );
   mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
   mapHeight.format = THREE.RGBFormat;
