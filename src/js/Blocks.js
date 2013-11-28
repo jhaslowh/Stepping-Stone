@@ -1,19 +1,13 @@
 /** Block structure */
 function Block(x,y,type, mesh){
   // Location of block
-  this.x = x;
-  this.y = y;
+  this.x = x, this.y = y;   // Top left corner of block location 
   this.width = 25;
   this.height = 25;
-  
-  // Block type
-  this.block_type = type; 
-  
-  this.mesh = mesh;
-  
-  // State
-  this.active = true;
-  this.collides = true;
+  this.block_type = type;   // Type of block 
+  this.mesh = mesh;         // Block mesh 
+  this.active = true;       // Set to true if block is on level, false if not. 
+  this.collides = true;     // Set to true if block collides with player 
 }
 
 /** Block type list */

@@ -149,7 +149,7 @@ GameLevel.prototype.init = function (w,h){
 
 /** Update the state of the level */
 GameLevel.prototype.update = function(){
-  // Update camera 
+  // Update camera controls 
   if (keyboard[KEY_Q]){
     this.camera_tilt -= 1;
     if (this.camera_tilt < this.camera_min_tilt)
@@ -184,11 +184,15 @@ GameLevel.prototype.update = function(){
 /** Draw the level to the screen */
 GameLevel.prototype.draw = function (renderer){
   // Setup camera 
+  // Move out to zoom location 
   var cam_loc = new THREE.Vector3(0,0,this.camera_zoom);
   var matrix = new THREE.Matrix4();
+  // Make rotation matrix based off of tilt 
   matrix = matrix.makeRotationAxis(
     new THREE.Vector3(1,0,0), this.camera_tilt * (Math.PI/180));
+  // Apply matrix to location 
   cam_loc.applyProjection(matrix);
+  // Move location to correct x and y values 
   cam_loc.x += this.camera_loc.x;
   cam_loc.y += this.camera_loc.y;
   
@@ -252,7 +256,7 @@ GameLevel.prototype.generateChunk = function (){
   block_grid[this.hor_blocks-1][this.last_path_block] = BlockType.Path;
   
   /** Generate obstacles */
-  
+  // TODO 
   
   /** Convert grid to real blocks */
   // Reset list state 
