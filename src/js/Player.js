@@ -157,12 +157,12 @@ Player.prototype.checkCollision = function(level){
     // Make sure block is alive and not null
     if (level.blocks[i].active && level.blocks[i].collides){
       // x axis collision check 
-      if (this.checkBlockX(level.blocks[i])){
+      if (this.checkBlockX(level.blocks[i]) && this.pass_x){
         this.pass_x = false;
       }
       
       // y axis collision check 
-      if (this.checkBlockY(level.blocks[i])){
+      if (this.checkBlockY(level.blocks[i]) && this.pass_y){
         // Might need this
         // this.mesh.position.y = level.blocks[i].y - this.h;
         
@@ -183,7 +183,7 @@ Player.prototype.collisionResponse = function(){
     this.mesh.position.y = this.ny;
     
   // Stop jump if hits wall 
-  if ((!this.pass_x || !this.pass_y) && this.jumping)
+  if (!this.pass_y && this.jumping)
     this.stopJump();
     
   // Air check 
