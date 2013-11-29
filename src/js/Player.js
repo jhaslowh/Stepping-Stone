@@ -156,13 +156,9 @@ Player.prototype.checkCollision = function(level){
   for (var i = 0; i < level.blocks.length; i++){
     // Make sure block is alive and not null
     if (level.blocks[i].active && level.blocks[i].collides){
-      var xHits = false;
-      var yHits = false;
-    
       // x axis collision check 
       if (this.checkBlockX(level.blocks[i])){
         this.pass_x = false;
-        xHits = true;
       }
       
       // y axis collision check 
@@ -172,12 +168,6 @@ Player.prototype.checkCollision = function(level){
         
         this.hitGround();
         this.pass_y = false;
-        yHits = true;
-      }
-      
-      if (!xHits && !yHits && this.checkBlockBoth(level.blocks[i])){
-        this.pass_y = false;
-        this.pass_x = false;
       }
     }
   }

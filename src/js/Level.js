@@ -3,6 +3,7 @@
 function GameLevel(){
   // List of all blocks 
   this.blocks = [];
+  this.chunks = [];
   
   // Player
   this.player = new Player();
@@ -155,12 +156,22 @@ GameLevel.prototype.init = function (w,h){
   material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: true });
   var cube = new THREE.CubeGeometry( 250,250,250); 
   var mesh = new THREE.Mesh(cube, material);
-  mesh.position.x = w/2;
+  mesh.position.x = w/2 - 150;
   mesh.position.y = h/2;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  this.test_cube = mesh;
   //this.scene.add(mesh);
+  this.test_cube = mesh;
+  cube = new THREE.CubeGeometry( 250,250,250); 
+  mesh = new THREE.Mesh(cube, material);
+  mesh.position.x = w/2 + 150;
+  mesh.position.y = h/2;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.position.x -= this.test_cube.position.x;
+  mesh.position.y -= this.test_cube.position.y;
+  THREE.GeometryUtils.merge(this.test_cube.geometry, mesh);
+  //this.scene.add(this.test_cube);
 }
 
 /** Update the state of the level */
@@ -193,8 +204,8 @@ GameLevel.prototype.update = function(){
     this.generateChunk();
     
   // TODO remove
-  this.test_cube.rotation.x += .01;
-  this.test_cube.rotation.y += .01;
+  //this.test_cube.rotation.x += .01;
+  //this.test_cube.rotation.y += .01;
 }
 
 /** Draw the level to the screen */
@@ -326,6 +337,10 @@ GameLevel.prototype.generateChunk = function (){
   /** Convert grid to real blocks */
   // Reset list state 
   this.block_list_full = false;
+  var chunk_index = this.nextChunkIndex();
+  this.chunks[chunk_index] = new Chunk();
+  this.chunks[chunk_index].right = this.next_gen_loc + this.hor_blocks * 25;
+  this.chunks[chunk_index].active = true;
   
   // Add blocks from grid into list 
   for (var i = 0; i < this.hor_blocks; i++){
@@ -345,15 +360,16 @@ GameLevel.prototype.generateChunk = function (){
         block_grid[i][j] = BlockType.NoBlock;
       
       if (block_grid[i][j] !== BlockType.NoBlock){
-        var index = this.nextChunkIndex();
+        var index = this.nextBlockIndex();
         var block = generateBlock(block_grid[i][j], 
-            this.next_gen_loc +(i * 25), this.gen_top + ( j * 25));
+            this.next_gen_loc +(i * 25), this.gen_top + ( j * 25), this.chunks[chunk_index]);
         this.blocks[index] = block;
-        this.scene.add(block.mesh);
       }
     }
   }
   
+  // Add chunk to scene 
+  this.chunks[chunk_index].finish(this.scene);
   // Move next gen spot 
   this.next_gen_loc += this.hor_blocks * 25;
   
@@ -376,8 +392,8 @@ GameLevel.prototype.generateChunk = function (){
 }
 
 
-/** Get the index of the next available chunk */
-GameLevel.prototype.nextChunkIndex = function (){
+/** Get the index of the next available block */
+GameLevel.prototype.nextBlockIndex = function (){
   var i = this.blocks.length;
   if (!this.block_list_full){
     // Go through block list and find first dead block
@@ -388,6 +404,17 @@ GameLevel.prototype.nextChunkIndex = function (){
   }
   // If no block found, return end of list 
   this.block_list_full = true;
+  return i;
+}
+
+/** Get the index of the next chunk */
+GameLevel.prototype.nextChunkIndex = function (){
+  var i = this.chunks.length;
+  // Go through chunk list and find first dead chunk
+  for (i = 0; i < this.chunks.length; i++){
+    if (!this.chunks[i].active)
+      return i;
+  }
   return i;
 }
 
