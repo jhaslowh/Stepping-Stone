@@ -13,9 +13,11 @@ function Block(x,y,type, mesh){
 /** Block type list */
 var BlockType = { 
   "NoBlock": 0,
-  "Path": 1, //(used for the correct block path for the player, should not be drawn)
-  "Rock": 2, 
-  "Sand": 3 
+  "Auto": 1, // Sets itself during generation 
+  "Path": 2, //(used for the correct block path for the player, should not be drawn)
+  "Rock": 3,
+  "UnderWRock": 4,
+  "Sand": 5
 };
 
 /** Update block */
@@ -32,14 +34,16 @@ function generateBlock(type, x, y){
   if (type == BlockType.Path){
     var cube = new THREE.CubeGeometry( 25,25,25); 
     var material = new THREE.MeshLambertMaterial( { color: 0x99ff9b} );
-    //material.opacity = .55;
+   // material.opacity = .55;
     //material.transparent = true;
     var mesh = new THREE.Mesh(cube, material);
     mesh.position.x = x + 12;
     mesh.position.y = y + 12;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    return new Block(x,y,type,mesh);
+    var b = new Block(x,y,type,mesh);
+    b.collides = false;
+    return b;
   }
   else if (type == BlockType.Rock){
     var mapHeight = THREE.ImageUtils.loadTexture( 'res/rock.png' );
@@ -55,8 +59,24 @@ function generateBlock(type, x, y){
     return new Block(x,y,type,mesh);
   }
   else if (type == BlockType.Sand){
+    var mapHeight = THREE.ImageUtils.loadTexture( 'res/sand.png' );
+    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+    mapHeight.format = THREE.RGBFormat;
+    material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xffefa7, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 5, metal: false });
     var cube = new THREE.CubeGeometry( 25,25,25); 
-    var material = new THREE.MeshLambertMaterial( { color: 0xffefa7} );
+    var mesh = new THREE.Mesh(cube, material);
+    mesh.position.x = x + 12;
+    mesh.position.y = y + 12;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    return new Block(x,y,type,mesh);
+  }
+  else if (type == BlockType.UnderWRock){
+    var mapHeight = THREE.ImageUtils.loadTexture( 'res/UnderWRock.png' );
+    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+    mapHeight.format = THREE.RGBFormat;
+    material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x3e4a60, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
+    var cube = new THREE.CubeGeometry( 25,25,25); 
     var mesh = new THREE.Mesh(cube, material);
     mesh.position.x = x + 12;
     mesh.position.y = y + 12;

@@ -1,4 +1,5 @@
-// Structure to hold all level data 
+/** Structure to hold all level data 
+ * NOTE: If a variable is not set here, then it is set in init() **/
 function GameLevel(){
   // List of all blocks 
   this.blocks = [];
@@ -8,8 +9,9 @@ function GameLevel(){
   // Water
   this.water_cube;            // Mesh for water. 
   this.water_level;           // Y value for sea level. set in init()
-  this.water_size = 0;        // Width for water and sea floor. set in init()
+  this.water_size = 2000;     // Width for water and sea floor.
   this.sea_floor;             // Sea floor mesh, created in init()
+  this.sea_floor_2;             
   // Lights
   this.hem_light;             
   this.direct_light;
@@ -18,25 +20,29 @@ function GameLevel(){
   this.camera;
   this.camera_move_speed = 1; // (TODO set) The camera will move to the right, player must keep up
   this.camera_loc = {x:0,y:0};// Current camera location. Controled by level
-  this.camera_zoom = 0;       // Zoom for camera, auto calculated. 
+  this.camera_zoom;           // Zoom for camera, auto calculated in init()
   this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
   this.camera_max_tilt = 35;  // This is tilt down
   this.camera_min_tilt = -15; // This is tilt up
   this.scene;                 // Scene to hold all geometry 
+  this.draw_correct_path = true; // Set to draw correct path to screen
   
   // Generation variables 
   // All these values will be set in init()
-  this.next_gen_loc = 0; // Starting x value for next chunk of generated land 
-  this.vert_blocks = 0;  // Number of vertical blocks per chunk
-  this.hor_blocks = 0;   // Number of horozontal blocks per chunk
-  this.gen_top = 0;      // Top of generation range 
-  this.gen_bottom = 0;   // Bottom of generation range (bottom box y value plus height)
-  this.screen_width = 0; // Width of screen 
-  this.screen_height = 0;// height of screen 
+  this.next_gen_loc;     // Starting x value for next chunk of generated land 
+  this.vert_blocks;      // Number of vertical blocks per chunk
+  this.hor_blocks;       // Number of horozontal blocks per chunk
+  this.gen_top;          // Top of generation range 
+  this.gen_bottom;       // Bottom of generation range (bottom box y value plus height)
+  this.screen_width;     // Width of screen 
+  this.screen_height;    // height of screen 
   this.block_list_full = false; // used in index method to make it faster 
   // Row of last path block placed 
   this.last_path_block = -1;  // Last y index value in grid for path generation 
-  this.grid_water_level = 0;  // Where in the grid the water level is 
+  this.grid_water_level;      // Where in the grid the water level is 
+  this.under_path_percent = .4; // Chance to generate a block under the path if above water
+  this.chunks_per_gen = 25;        // Number of chunks to generate each call to gen chunk.
+  this.block_overflow_grid;   // Overflow grid so that we dont get strait lines on chunk seems
   
   // TODO remove
   this.test_cube;
@@ -81,12 +87,13 @@ GameLevel.prototype.init = function (w,h){
   this.grid_water_level = Math.round(this.vert_blocks/2);
   this.last_path_block = this.grid_water_level + 1;
   
+  // Make overflow grid 
+  this.resetOverflowGrid();
   // Need to generate starting terrain (probably 3 screens worth) 
   this.generateChunk();
   
   /** Set up water */
   this.water_level = h/2;
-  this.water_size = w * 2;
   // Water shape for now will be the width plus 200, 1000 height, and 160 depth. 
   var c = new THREE.CubeGeometry(this.water_size, this.gen_bottom - (h/2), 160); 
   var material = new THREE.MeshLambertMaterial( { color: 0x00CAFC} );
@@ -99,12 +106,21 @@ GameLevel.prototype.init = function (w,h){
   this.fix_water_level();
   
   /** Set up sea floor */
-  material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xb88854, specular: 0x333333, shininess: 0, metal: false });
-  c = new THREE.CubeGeometry(this.water_size, 50, 160);
+  var mapHeight = THREE.ImageUtils.loadTexture( 'res/sea_floor.png' );
+  mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+  mapHeight.format = THREE.RGBFormat;
+  material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xb88854, specular: 0x333333, bumpMap: mapHeight, bumpScale: 10, shininess: 0, metal: false });
+  c = new THREE.CubeGeometry(this.water_size, 160, 160); // Don't change the width and depth here, the bump map is based off of them 
   this.sea_floor = new THREE.Mesh(c, material);
   this.sea_floor.receiveShadow = true;
+  this.sea_floor.position.x = this.camera_loc.x;
   this.sea_floor.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
+  this.sea_floor2 = new THREE.Mesh(c, material);
+  this.sea_floor2.receiveShadow = true;
+  this.sea_floor2.position.x = this.camera_loc.x + this.water_size;
+  this.sea_floor2.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
   this.scene.add(this.sea_floor);
+  this.scene.add(this.sea_floor2);
   
   /** Set up lights */
   // Hemisphere light
@@ -203,16 +219,67 @@ GameLevel.prototype.draw = function (renderer){
   renderer.render( this.scene, this.camera );
 }
 
+/** Set the water level to the appropriate height */
+GameLevel.prototype.fix_water_level = function (){
+  this.water_cube.position.y = this.water_level + (this.water_cube.geometry.height /2);
+}
+
+/** Set the water location based on camera location */
+GameLevel.prototype.fix_water_loc = function(){
+  this.water_cube.position.x = this.camera_loc.x;
+  if (this.sea_floor.position.x < this.camera_loc.x - this.water_size)
+    this.sea_floor.position.x = this.sea_floor2.position.x + this.water_size;
+  if (this.sea_floor2.position.x < this.camera_loc.x - this.water_size)
+    this.sea_floor2.position.x = this.sea_floor.position.x + this.water_size;
+}
+
+/** Fix the light location based off of the camera */
+GameLevel.prototype.fix_light_loc = function(){
+  this.hem_light.position.set( this.camera_loc.x, -500, 0 );
+  this.direct_light.position.set( this.camera_loc.x, -400, -200 );
+  this.direct_light.target.position.set( this.camera_loc.x, 0, 0 );
+}
+
+/** Get the x value of the left side of the level */
+GameLevel.prototype.level_left = function(){
+  return this.camera_loc.x - (this.screen_width/2);
+}
+
+/** Get the x value of the right side of the level */
+GameLevel.prototype.level_right = function(){
+  return this.camera_loc.x + (this.screen_width/2);
+}
+
+/** Get the y value of the bottom of the level */
+GameLevel.prototype.level_bottom = function(){
+  return this.gen_bottom;
+}
+
+/** Get the y value of the top of the level */
+GameLevel.prototype.level_top = function(){
+  return this.gen_top;
+}
+
+/** ========================================================= **/
+/** =================== Block Generation ==================== **/
+/** ========================================================= **/
+
 /** Generate a new chunk of terrain */
 GameLevel.prototype.generateChunk = function (){
   // Temporary grid to store blocks 
-  var block_grid = [this.hor_blocks];
-  // Create block grid 
-  for (var i = 0; i < this.hor_blocks; i++){
-    block_grid[i] = [this.vert_blocks];
-    for (var j = 0; j < this.vert_blocks; j++)
-      block_grid[i][j] = BlockType.NoBlock;
-  }
+  var block_grid = this.block_overflow_grid;
+  this.resetOverflowGrid();
+  
+  /** Generate obstacles */
+  for (var i = 0; i < this.chunks_per_gen; i ++){
+    var type = Math.round(Math.random() * 2);
+    if (type == 0)
+      this.gen_rec(block_grid, BlockType.Auto);
+    else if (type == 1)
+      this.gen_type1(block_grid, BlockType.Auto);
+    else if (type == 2)
+      this.gen_type2(block_grid, BlockType.Auto);
+  } 
   
   /** Generate correct path */
   var direction = -1;
@@ -228,35 +295,33 @@ GameLevel.prototype.generateChunk = function (){
     else
       direction = Math.round(Math.random() * 2)
     
+    this.setPathBlockInGrid(block_grid, i, j, BlockType.Path);
     if (direction == 0){
       // Front two blocks 
-      block_grid[i][this.last_path_block] = BlockType.Path;
-      block_grid[i+1][this.last_path_block] = BlockType.Path;
+      this.setPathBlockInGrid(block_grid, i, this.last_path_block, BlockType.Path);
+      this.setPathBlockInGrid(block_grid, i+1,this.last_path_block, BlockType.Path);
       // Top two blocks 
-      block_grid[i][this.last_path_block-1] = BlockType.Path;
-      block_grid[i+1][this.last_path_block-1] = BlockType.Path;
+      this.setPathBlockInGrid(block_grid, i, this.last_path_block-1, BlockType.Path);
+      this.setPathBlockInGrid(block_grid, i+1, this.last_path_block-1, BlockType.Path);
       
       // Move path block up 
       this.last_path_block -= 1;
     } else if(direction == 1){
       // Front block
-      block_grid[i][this.last_path_block] = BlockType.Path;
+      this.setPathBlockInGrid(block_grid, i, this.last_path_block, BlockType.Path);
     } else if(direction == 2){
       // Front two blocks 
-      block_grid[i][this.last_path_block] = BlockType.Path;
-      block_grid[i+1][this.last_path_block] = BlockType.Path;
+      this.setPathBlockInGrid(block_grid, i, this.last_path_block, BlockType.Path);
+      this.setPathBlockInGrid(block_grid, i+1, this.last_path_block, BlockType.Path);
       // Top two blocks 
-      block_grid[i][this.last_path_block+1] = BlockType.Path;
-      block_grid[i+1][this.last_path_block+1] = BlockType.Path;
+      this.setPathBlockInGrid(block_grid, i, this.last_path_block+1, BlockType.Path);
+      this.setPathBlockInGrid(block_grid,i+1,this.last_path_block+1, BlockType.Path);
       
       // Move path block up 
       this.last_path_block += 1;
     }
   }
   block_grid[this.hor_blocks-1][this.last_path_block] = BlockType.Path;
-  
-  /** Generate obstacles */
-  // TODO 
   
   /** Convert grid to real blocks */
   // Reset list state 
@@ -265,6 +330,20 @@ GameLevel.prototype.generateChunk = function (){
   // Add blocks from grid into list 
   for (var i = 0; i < this.hor_blocks; i++){
     for (var j = 0; j < this.vert_blocks; j++){
+      // Set block type based off of height 
+      if (block_grid[i][j] == BlockType.Auto){
+        if (j > (this.grid_water_level-1) + 3)
+          block_grid[i][j] = BlockType.UnderWRock;
+        else if (j >= this.grid_water_level - 1)
+          block_grid[i][j] = BlockType.Sand;
+        else 
+          block_grid[i][j] = BlockType.Rock;
+      }
+      
+      // Turn off path if it is set off 
+      if (block_grid[i][j] == BlockType.Path && !this.draw_correct_path)
+        block_grid[i][j] = BlockType.NoBlock;
+      
       if (block_grid[i][j] !== BlockType.NoBlock){
         var index = this.nextChunkIndex();
         var block = generateBlock(block_grid[i][j], 
@@ -312,40 +391,137 @@ GameLevel.prototype.nextChunkIndex = function (){
   return i;
 }
 
-/** Set the water level to the appropriate height */
-GameLevel.prototype.fix_water_level = function (){
-  this.water_cube.position.y = this.water_level + (this.water_cube.geometry.height /2);
+/** Reset the overflow grid to use next time */
+GameLevel.prototype.resetOverflowGrid = function(){
+  // Temporary grid to store blocks 
+  this.block_overflow_grid = [this.hor_blocks];
+  // Create block grid 
+  for (var i = 0; i < this.hor_blocks; i++){
+    this.block_overflow_grid[i] = [this.vert_blocks];
+    for (var j = 0; j < this.vert_blocks; j++)
+      this.block_overflow_grid[i][j] = BlockType.NoBlock;
+  }
 }
 
-/** Set the water location based on camera location */
-GameLevel.prototype.fix_water_loc = function(){
-  this.water_cube.position.x = this.camera_loc.x;
-  this.sea_floor.position.x = this.camera_loc.x;
+/** Helper method to set a block in a block grid. 
+ * Check indexes to make sure it is a valid placement */
+GameLevel.prototype.setBlockInGrid = function(grid, i, j, type){
+  // If block fits in first grid, put it there
+  if (i >= 0 && i < this.hor_blocks && j >= 0 && j < this.vert_blocks)
+    grid[i][j] = type;
+  // If it doesnt fit in first grid, check if it fits in second grid 
+  else if (i >= this.hor_blocks && j >= 0 && j < this.vert_blocks){
+    i -= this.hor_blocks;
+    this.block_overflow_grid[i][j] = type;
+  }
 }
 
-/** Fix the light location based off of the camera */
-GameLevel.prototype.fix_light_loc = function(){
-  this.hem_light.position.set( this.camera_loc.x, -500, 0 );
-  this.direct_light.position.set( this.camera_loc.x, -400, -200 );
-  this.direct_light.target.position.set( this.camera_loc.x, 0, 0 );
+/** This is the same as the method above, except it places a block below
+ ** the path **/
+GameLevel.prototype.setPathBlockInGrid = function(grid, i, j, type){
+  if (i >= 0 && i < this.hor_blocks && j >= 0 && j < this.vert_blocks)
+    grid[i][j] = type;
+  
+  // Place block below path if above water. 
+  j++;
+  var place_block = Math.random();
+  if (i >= 0 && i < this.hor_blocks && j >= 0 && j < this.vert_blocks && 
+      // Make sure block isnt path block 
+      grid[i][j] != BlockType.Path && 
+      // Random to decide whether to place 
+      place_block < this.under_path_percent && 
+      // Make sure path is above water level
+      j-1 < this.grid_water_level)
+    grid[i][j] = BlockType.Auto;
 }
 
-/** Get the x value of the left side of the level */
-GameLevel.prototype.level_left = function(){
-  return this.camera_loc.x - (this.screen_width/2);
+
+/** Generate a square in the grid **/
+GameLevel.prototype.gen_rec = function(grid, type){
+  // Randomly decide top left corner for block 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  // Randomly get a size 
+  var w = Math.round(Math.random() * 3) + 1;
+  var h = Math.round(Math.random() * 3) + 1;
+  
+  for (var i = 0; i < w; i++){
+    for (var j = 0; j < h; j++){
+      this.setBlockInGrid(grid, x + i, y + j, type)
+    }
+  }
 }
 
-/** Get the x value of the right side of the level */
-GameLevel.prototype.level_right = function(){
-  return this.camera_loc.x + (this.screen_width/2);
+/** Generate a block shape that looks like the following 
+ *   #
+ *  ###
+ * #####
+ *  ###
+ *   #   **/
+GameLevel.prototype.gen_type1 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x - 1, y, type);
+  this.setBlockInGrid(grid, x - 2, y, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x + 2, y, type);
+  this.setBlockInGrid(grid, x, y - 1, type);
+  this.setBlockInGrid(grid, x, y - 2, type);
+  this.setBlockInGrid(grid, x, y + 1, type);
+  this.setBlockInGrid(grid, x, y + 2, type);
+  this.setBlockInGrid(grid, x - 1, y - 1, type);
+  this.setBlockInGrid(grid, x + 1, y - 1, type);
+  this.setBlockInGrid(grid, x + 1, y + 1, type);
+  this.setBlockInGrid(grid, x - 1, y + 1, type);
 }
 
-/** Get the y value of the bottom of the level */
-GameLevel.prototype.level_bottom = function(){
-  return this.gen_bottom;
+/** Generate a block shape that looks like the following 
+ *      #####
+ *    #########
+ *      #####
+ **/
+GameLevel.prototype.gen_type2 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x - 1, y, type);
+  this.setBlockInGrid(grid, x - 2, y, type);
+  this.setBlockInGrid(grid, x - 3, y, type);
+  this.setBlockInGrid(grid, x - 4, y, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x + 2, y, type);
+  this.setBlockInGrid(grid, x + 3, y, type);
+  this.setBlockInGrid(grid, x + 4, y, type);
+  this.setBlockInGrid(grid, x - 2, y - 1, type);
+  this.setBlockInGrid(grid, x - 1, y - 1, type);
+  this.setBlockInGrid(grid, x, y - 1, type);
+  this.setBlockInGrid(grid, x + 1, y - 1, type);
+  this.setBlockInGrid(grid, x + 2, y - 1, type);
+  this.setBlockInGrid(grid, x - 2, y + 1, type);
+  this.setBlockInGrid(grid, x - 1, y + 1, type);
+  this.setBlockInGrid(grid, x, y + 1, type);
+  this.setBlockInGrid(grid, x + 1, y + 1, type);
+  this.setBlockInGrid(grid, x + 2, y + 1, type);
 }
 
-/** Get the y value of the top of the level */
-GameLevel.prototype.level_top = function(){
-  return this.gen_top;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

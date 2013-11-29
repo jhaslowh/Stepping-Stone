@@ -15,7 +15,7 @@ function Player(){
   this.jumpt = 0;
   this.yo = 0;
   this.air_t = 0;
-  this.jumpTime = .35;
+  this.jumpTime = .45;
 	this.minAirtForInAir = .02;
   
   // States 
@@ -142,10 +142,10 @@ Player.prototype.checkCollision = function(level){
     //this.mesh.position.y = level.level_bottom() - this.h;
     this.pass_y = false;
   }
-  else if (this.ny < level.level_top()){
+  /*else if (this.ny < level.level_top()){
     //this.mesh.position.y = level.level_top();
     this.pass_y = false;
-  }
+  }*/
   
   // Check if the player was above water and lands in it
   if (this.in_water == false && this.ny > level.water_level - (this.h/2)){
@@ -156,18 +156,28 @@ Player.prototype.checkCollision = function(level){
   for (var i = 0; i < level.blocks.length; i++){
     // Make sure block is alive and not null
     if (level.blocks[i].active && level.blocks[i].collides){
+      var xHits = false;
+      var yHits = false;
+    
       // x axis collision check 
-      if (this.checkBlockX(level.blocks[i]) && this.pass_x){
+      if (this.checkBlockX(level.blocks[i])){
         this.pass_x = false;
+        xHits = true;
       }
       
       // y axis collision check 
-      if (this.checkBlockY(level.blocks[i]) && this.pass_y){
+      if (this.checkBlockY(level.blocks[i])){
         // Might need this
         // this.mesh.position.y = level.blocks[i].y - this.h;
         
         this.hitGround();
         this.pass_y = false;
+        yHits = true;
+      }
+      
+      if (!xHits && !yHits && this.checkBlockBoth(level.blocks[i])){
+        this.pass_y = false;
+        this.pass_x = false;
       }
     }
   }
@@ -222,4 +232,12 @@ Player.prototype.checkBlockY = function(block){
     block.y > (this.ny + this.h) ||
     (block.x + block.width) < this.mesh.position.x ||
     block.x > (this.mesh.position.x + this.w));
+}
+
+/** Check collision on both axis's */
+Player.prototype.checkBlockBoth = function(block){
+  return !((block.y + block.height) < this.ny ||
+    block.y > (this.ny + this.h) ||
+    (block.x + block.width) < this.nx ||
+    block.x > (this.nx + this.w));
 }
