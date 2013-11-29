@@ -8,6 +8,7 @@ var mouse = {x:0, y:0};
 var gameState = "playing";
 var level = new GameLevel();
 var time_step = .016;
+var WIDTH = 0, HEIGHT = 0;
 
 // Three.js variables 
 var renderer;
@@ -20,7 +21,7 @@ function init(){
   loadResources();
   
   // Window size 
-  var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+  WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
   //var WIDTH = 800, HEIGHT = 600;
         
   // Set up level 
@@ -54,6 +55,12 @@ function init(){
 // Main Game loop 
 function gameLoop() 
 {
+  // Check for restart 
+  if (keyboard[KEY_R]){
+    level = new GameLevel();
+    level.init(WIDTH,HEIGHT);
+  }
+  
   // Update
   level.update();
   

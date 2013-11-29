@@ -31,7 +31,10 @@ I/O File for the game. Handles keyboard and mouse.
 **Controls**
 
 AWSD  : Move the player
+
 Q & E : Rotate the camera 
+
+R     : Restart game 
 
 **Notes**
 
