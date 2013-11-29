@@ -45,6 +45,10 @@ function GameLevel(){
   this.chunks_per_gen = 25;        // Number of chunks to generate each call to gen chunk.
   this.block_overflow_grid;   // Overflow grid so that we dont get strait lines on chunk seems
   
+  // States 
+  this.paused = false;      
+  this.gameover = false;
+  
   // TODO remove
   this.test_cube;
 }
@@ -160,52 +164,44 @@ GameLevel.prototype.init = function (w,h){
   mesh.position.y = h/2;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  //this.scene.add(mesh);
   this.test_cube = mesh;
-  cube = new THREE.CubeGeometry( 250,250,250); 
-  mesh = new THREE.Mesh(cube, material);
-  mesh.position.x = w/2 + 150;
-  mesh.position.y = h/2;
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  mesh.position.x -= this.test_cube.position.x;
-  mesh.position.y -= this.test_cube.position.y;
-  THREE.GeometryUtils.merge(this.test_cube.geometry, mesh);
   //this.scene.add(this.test_cube);
 }
 
 /** Update the state of the level */
 GameLevel.prototype.update = function(){
-  // Update camera controls 
-  if (keyboard[KEY_Q]){
-    this.camera_tilt -= 1;
-    if (this.camera_tilt < this.camera_min_tilt)
-      this.camera_tilt = this.camera_min_tilt;
-  }
-  if (keyboard[KEY_E]){
-    this.camera_tilt += 1;
-    if (this.camera_tilt > this.camera_max_tilt)
-      this.camera_tilt = this.camera_max_tilt;
-  }
-  
-  this.camera_loc.x += this.camera_move_speed;
-  this.fix_water_loc();
-  this.fix_light_loc();
-  
-  // Update Player
-  this.player.update(this);
-  
-  // Update blocks 
-  for (var i = 0; i < this.blocks.length; i++)
-    this.blocks[i].update(this);
+  // Update pause button 
+  if (keyboard[KEY_P] && !keyboard_old[KEY_P])
+    this.paused = !this.paused;
+
+  if (!this.paused){
+    // Update camera controls 
+    if (keyboard[KEY_Q]){
+      this.camera_tilt -= 1;
+      if (this.camera_tilt < this.camera_min_tilt)
+        this.camera_tilt = this.camera_min_tilt;
+    }
+    if (keyboard[KEY_E]){
+      this.camera_tilt += 1;
+      if (this.camera_tilt > this.camera_max_tilt)
+        this.camera_tilt = this.camera_max_tilt;
+    }
     
-  // Block generation 
-  if (this.camera_loc.x + this.screen_width > this.next_gen_loc)
-    this.generateChunk();
+    this.camera_loc.x += this.camera_move_speed;
+    this.fix_water_loc();
+    this.fix_light_loc();
     
-  // TODO remove
-  //this.test_cube.rotation.x += .01;
-  //this.test_cube.rotation.y += .01;
+    // Update Player
+    this.player.update(this);
+    
+    // Update blocks 
+    for (var i = 0; i < this.blocks.length; i++)
+      this.blocks[i].update(this);
+      
+    // Block generation 
+    if (this.camera_loc.x + this.screen_width > this.next_gen_loc)
+      this.generateChunk();
+  }
 }
 
 /** Draw the level to the screen */

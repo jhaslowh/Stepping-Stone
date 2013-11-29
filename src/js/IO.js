@@ -73,14 +73,16 @@ function addKeyboardEvents()
   });
 }
 
-/** Load resources files */ 
-function loadResources() 
-{
-  /*gun_image = new Image();
-  gun_image.src = 'images/gun.png';
+/** Update the key states of the keyboard **/
+function updateKeyboardButtons(){
+  for (var i = 65; i < 90; i++){
+    keyboard_old[i] = keyboard[i];
+  }
   
-  baby_sound = document.createElement("audio");
-  document.body.appendChild(baby_sound);
-  baby_sound.setAttribute("src", "sounds/baby.mp3");*/
-
+  keyboard_old[16] = keyboard[16];
+  keyboard_old[32] = keyboard[32];
+  keyboard_old[37] = keyboard[37];
+  keyboard_old[38] = keyboard[38];
+  keyboard_old[39] = keyboard[39];
+  keyboard_old[40] = keyboard[40];
 }

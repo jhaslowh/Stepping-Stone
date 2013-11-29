@@ -36,6 +36,8 @@ Q & E : Rotate the camera
 
 R     : Restart game 
 
+P     : Pause game
+
 **Notes**
 
 Currently using 2 spaces for each tab, if this is a problem we an switch to 4 spaces per tab. 

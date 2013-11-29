@@ -2,6 +2,7 @@
 
 // Input 
 var keyboard = {};
+var keyboard_old = {};
 var mouse = {x:0, y:0};
 
 // Game variables 
@@ -16,9 +17,6 @@ var renderer;
 // Beginning initialization 
 function init(){
   initIO();
-  
-  //load assets
-  loadResources();
   
   // Window size 
   WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
@@ -63,6 +61,7 @@ function gameLoop()
   
   // Update
   level.update();
+  updateKeyboardButtons();
   
   // Render
   level.draw(renderer);
