@@ -35,8 +35,9 @@ function init(){
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
   renderer.physicallyBasedShading = true;
-  renderer.shadowMapEnabled = true;
-  renderer.shadowMapCullFace = THREE.CullFaceBack;
+  renderer.shadowMapEnabled = true;         // Turn on shadows
+  renderer.autoClear = false;               // Tell renderer not to auto clear
+  renderer.shadowMapCullFace = THREE.CullFaceBack; // Set the cull face 
   
   document.body.appendChild(renderer.domElement);
   
@@ -64,6 +65,7 @@ function gameLoop()
   updateKeyboardButtons();
   
   // Render
+  renderer.clear();
   level.draw(renderer);
 }
 
