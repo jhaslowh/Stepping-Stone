@@ -26,7 +26,7 @@ function GameLevel(){
   this.camera_max_tilt = 35;  // This is tilt down
   this.camera_min_tilt = -15; // This is tilt up
   this.scene;                 // Scene to hold all geometry 
-  this.draw_correct_path = false; // Set to draw correct path to screen
+  this.draw_correct_path = true; // Set to draw correct path to screen
   
   // Generation variables 
   // All these values will be set in init()
@@ -40,6 +40,7 @@ function GameLevel(){
   this.block_list_full = false; // used in index method to make it faster 
   // Row of last path block placed 
   this.last_path_block = -1;  // Last y index value in grid for path generation 
+  this.last_path_block2 = -1;  // Last y index value in grid for path generation 
   this.grid_water_level;      // Where in the grid the water level is 
   this.under_path_percent = .4; // Chance to generate a block under the path if above water
   this.chunks_per_gen = 25;        // Number of chunks to generate each call to gen chunk.
@@ -88,6 +89,7 @@ GameLevel.prototype.init = function (w,h){
   this.gen_bottom = (h/2) + ((this.vert_blocks * 25)/2);
   this.grid_water_level = Math.round(this.vert_blocks/2);
   this.last_path_block = this.grid_water_level + 1;
+  this.last_path_block2 = this.grid_water_level + 1;
   
   // Make overflow grid 
   this.resetOverflowGrid();
@@ -278,48 +280,10 @@ GameLevel.prototype.generateChunk = function (){
   } 
   
   /** =========================== **/
-  /** Generate correct path */
+  /** Generate correct paths     **/
   /** =========================== **/
-  var direction = -1;
-  /* 0 = Up
-   * 1 = Right
-   * 2 = Down */
-  for (var i = 0; i < this.hor_blocks - 1; i++){
-    // Get next direction for path
-    if (this.last_path_block == 0)
-      direction = Math.round(Math.random()) + 1;
-    else if (this.last_path_block == this.vert_blocks - 1)
-      direction = Math.round(Math.random());
-    else
-      direction = Math.round(Math.random() * 2)
-    
-    this.setPathBlockInGrid(block_grid, i, j, BlockType.Path);
-    if (direction == 0){
-      // Front two blocks 
-      this.setPathBlockInGrid(block_grid, i, this.last_path_block, BlockType.Path);
-      this.setPathBlockInGrid(block_grid, i+1,this.last_path_block, BlockType.Path);
-      // Top two blocks 
-      this.setPathBlockInGrid(block_grid, i, this.last_path_block-1, BlockType.Path);
-      this.setPathBlockInGrid(block_grid, i+1, this.last_path_block-1, BlockType.Path);
-      
-      // Move path block up 
-      this.last_path_block -= 1;
-    } else if(direction == 1){
-      // Front block
-      this.setPathBlockInGrid(block_grid, i, this.last_path_block, BlockType.Path);
-    } else if(direction == 2){
-      // Front two blocks 
-      this.setPathBlockInGrid(block_grid, i, this.last_path_block, BlockType.Path);
-      this.setPathBlockInGrid(block_grid, i+1, this.last_path_block, BlockType.Path);
-      // Top two blocks 
-      this.setPathBlockInGrid(block_grid, i, this.last_path_block+1, BlockType.Path);
-      this.setPathBlockInGrid(block_grid,i+1,this.last_path_block+1, BlockType.Path);
-      
-      // Move path block up 
-      this.last_path_block += 1;
-    }
-  }
-  block_grid[this.hor_blocks-1][this.last_path_block] = BlockType.Path;
+  //this.makeCorrectPath(block_grid, this.last_path_block, 0);
+  this.makeCorrectPath(block_grid, this.last_path_block2, 1);
   
   /** =========================== **/
   /** Convert grid to real blocks **/
@@ -384,6 +348,54 @@ GameLevel.prototype.generateChunk = function (){
     var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top).mesh;
     this.scene.add(mesh);
   }*/
+}
+
+/** Generate a correct path **/
+GameLevel.prototype.makeCorrectPath = function(grid, path, path_number){
+  var directon = -1;
+  /* 0 = Up
+   * 1 = Right
+   * 2 = Down */
+  for (var i = 0; i < this.hor_blocks - 1; i++){
+    // Get next direction for path
+    if (path == 0)
+      direction = Math.round(Math.random()) + 1;
+    else if (path == this.vert_blocks - 1)
+      direction = Math.round(Math.random());
+    else
+      direction = Math.round(Math.random() * 2)
+    
+    //this.setPathBlockInGrid(grid, i, j, BlockType.Path);
+    if (direction == 0){
+      // Front two blocks 
+      this.setPathBlockInGrid(grid, i, path, BlockType.Path);
+      this.setPathBlockInGrid(grid, i+1,path, BlockType.Path);
+      // Top two blocks 
+      this.setPathBlockInGrid(grid, i, path-1, BlockType.Path);
+      this.setPathBlockInGrid(grid, i+1, path-1, BlockType.Path);
+      
+      // Move path block up 
+      path -= 1;
+    } else if(direction == 1){
+      // Front block
+      this.setPathBlockInGrid(grid, i, path, BlockType.Path);
+    } else if(direction == 2){
+      // Front two blocks 
+      this.setPathBlockInGrid(grid, i, path, BlockType.Path);
+      this.setPathBlockInGrid(grid, i+1, path, BlockType.Path);
+      // Top two blocks 
+      this.setPathBlockInGrid(grid, i, path+1, BlockType.Path);
+      this.setPathBlockInGrid(grid,i+1,path+1, BlockType.Path);
+      
+      // Move path block up 
+      path += 1;
+    }
+  }
+  grid[this.hor_blocks-1][path] = BlockType.Path;
+  
+  // Set path index for later 
+  if (path_number == 0) this.last_path_block = path;
+  if (path_number == 1) this.last_path_block2 = path;
 }
 
 
