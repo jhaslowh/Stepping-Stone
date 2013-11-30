@@ -10,6 +10,7 @@ var gameState = "playing";
 var level = new GameLevel();
 var time_step = .016;
 var WIDTH = 0, HEIGHT = 0;
+var hud = new Hud();
 
 // Three.js variables 
 var renderer;
@@ -24,6 +25,7 @@ function init(){
         
   // Set up level 
   level.init(WIDTH,HEIGHT);
+  hud.init(WIDTH, HEIGHT);
 
   /** Setup renderer */
   // Create Renderer
@@ -41,14 +43,14 @@ function init(){
   
   document.body.appendChild(renderer.domElement);
   
-  var stats = new Stats();
+  /*var stats = new Stats();
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
   document.body.appendChild( stats.domElement );
   setInterval( function () {
     stats.update();
-  }, 1000 / 60 );
+  }, 1000 / 60 );*/
 }
 
 // Main Game loop 
@@ -62,11 +64,13 @@ function gameLoop()
   
   // Update
   level.update();
+  hud.update();
   updateKeyboardButtons();
   
   // Render
   renderer.clear();
   level.draw(renderer);
+  hud.draw(renderer);
 }
 
 // Play a sound file 

@@ -26,7 +26,7 @@ function GameLevel(){
   this.camera_max_tilt = 35;  // This is tilt down
   this.camera_min_tilt = -15; // This is tilt up
   this.scene;                 // Scene to hold all geometry 
-  this.draw_correct_path = true; // Set to draw correct path to screen
+  this.draw_correct_path = false; // Set to draw correct path to screen
   
   // Generation variables 
   // All these values will be set in init()
