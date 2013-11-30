@@ -6,27 +6,32 @@ TODO Name
 
 **Project description**
 
-TODO
+In this game your objective is to not fall off the left side of the screen. This project was made for CS 425 as the final project for the class. 
+
+[Play latest version here.](http://www.divided-games.com/CS425/index.html)
 
 **File Descriptions**
 
-* Game.js
+* Game.js ::
 This is the main file for the game. It handles all of the I/O and also the game loop. 
 
-* Blocks.js
+* Blocks.js ::
 Holds the basic structure for each block Also Handles drawing for each block. 
 
-* Level.js
+* Level.js ::
 This is the main gameplay file. Level contains the level structure and all the objects needed to play a game. Level also will call all the update and draw functions for all of the other objects in the game. 
 
-* Player.js
+* Player.js ::
 Contains the player objects and all code needed to make the player work. 
 
-* three.js
+* three.js ::
 Necessary 3D library for the project. 
 
-* IO.js
+* IO.js ::
 I/O File for the game. Handles keyboard and mouse. 
+
+* Hud.js ::
+Does 2D screen drawing for the game. 
 
 **Controls**
 
