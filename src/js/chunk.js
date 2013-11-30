@@ -31,6 +31,6 @@ Chunk.prototype.update = function(level){
     if (this.underWaterRock_mesh != 0)scene.remove(this.underWaterRock_mesh);
     if (this.grass_mesh != 0)scene.remove(this.grass_mesh);
     if (this.dirt_mesh != 0)scene.remove(this.dirt_mesh);
-      this.active = false;
+    this.active = false;
   }
 }

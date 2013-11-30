@@ -19,7 +19,7 @@ function GameLevel(){
   
   // Rendering 
   this.camera;
-  this.camera_move_speed = 1; // (TODO set) The camera will move to the right, player must keep up
+  this.camera_move_speed = 1; // The camera will move to the right, player must keep up
   this.camera_loc = {x:0,y:0};// Current camera location. Controled by level
   this.camera_zoom;           // Zoom for camera, auto calculated in init()
   this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
@@ -264,7 +264,9 @@ GameLevel.prototype.generateChunk = function (){
   var block_grid = this.block_overflow_grid;
   this.resetOverflowGrid();
   
+  /** =========================== **/
   /** Generate obstacles */
+  /** =========================== **/
   for (var i = 0; i < this.chunks_per_gen; i ++){
     var type = Math.round(Math.random() * 2);
     if (type == 0)
@@ -275,7 +277,9 @@ GameLevel.prototype.generateChunk = function (){
       this.gen_type2(block_grid, BlockType.Auto);
   } 
   
+  /** =========================== **/
   /** Generate correct path */
+  /** =========================== **/
   var direction = -1;
   /* 0 = Up
    * 1 = Right
@@ -317,7 +321,9 @@ GameLevel.prototype.generateChunk = function (){
   }
   block_grid[this.hor_blocks-1][this.last_path_block] = BlockType.Path;
   
-  /** Convert grid to real blocks */
+  /** =========================== **/
+  /** Convert grid to real blocks **/
+  /** =========================== **/
   // Reset list state 
   this.block_list_full = false;
   var chunk_index = this.nextChunkIndex();
@@ -328,6 +334,7 @@ GameLevel.prototype.generateChunk = function (){
   // Add blocks from grid into list 
   for (var i = 0; i < this.hor_blocks; i++){
     for (var j = 0; j < this.vert_blocks; j++){
+      /** Process Blocks **/
       // Set block type based off of height 
       if (block_grid[i][j] == BlockType.Auto){
         if (j > (this.grid_water_level-1) + 3)
@@ -335,7 +342,8 @@ GameLevel.prototype.generateChunk = function (){
         else if (j >= this.grid_water_level - 1)
           block_grid[i][j] = BlockType.Sand;
         else 
-          if (block_grid[i][j-1] == BlockType.NoBlock)
+          if (block_grid[i][j-1] == BlockType.NoBlock ||
+              block_grid[i][j-1] == BlockType.Path)
             block_grid[i][j] = BlockType.Dirt;
           else
             block_grid[i][j] = BlockType.Rock;
@@ -345,6 +353,7 @@ GameLevel.prototype.generateChunk = function (){
       if (block_grid[i][j] == BlockType.Path && !this.draw_correct_path)
         block_grid[i][j] = BlockType.NoBlock;
       
+      /** Add blocks to level **/
       if (block_grid[i][j] !== BlockType.NoBlock){
         var index = this.nextBlockIndex();
         var block = generateBlock(block_grid[i][j], 

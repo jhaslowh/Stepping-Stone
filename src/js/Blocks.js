@@ -57,6 +57,9 @@ var UWRock_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x
     mapHeight.format = THREE.RGBFormat;
 var dirt_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xa67944, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 5, metal: false });
 
+// Grass material 
+var grass_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x59c964, specular: 0x333333, shininess: 0, metal: false });
+
 /** Return a block for the given type */
 function generateBlock(type, x, y, chunk){
   if (type == BlockType.Path){
@@ -146,12 +149,28 @@ function generateBlock(type, x, y, chunk){
     mesh.receiveShadow = true;
     
     // Put path into chunk 
-    if (chunk.sand_mesh == 0)
+    if (chunk.dirt_mesh == 0)
       chunk.dirt_mesh = mesh;
     else {
       mesh.position.x -= chunk.dirt_mesh.position.x;
       mesh.position.y -= chunk.dirt_mesh.position.y;
       THREE.GeometryUtils.merge(chunk.dirt_mesh.geometry, mesh);
+    }
+    
+    // Make grass 
+    cube = new THREE.CubeGeometry( 25,6,25); 
+    mesh = new THREE.Mesh(cube, grass_material);
+    mesh.position.x = x + 12;
+    mesh.position.y = y - 3;
+    mesh.receiveShadow = true;
+    
+    // Put path into chunk 
+    if (chunk.grass_mesh == 0)
+      chunk.grass_mesh = mesh;
+    else {
+      mesh.position.x -= chunk.grass_mesh.position.x;
+      mesh.position.y -= chunk.grass_mesh.position.y;
+      THREE.GeometryUtils.merge(chunk.grass_mesh.geometry, mesh);
     }
       
     return new Block(x,y,type);
