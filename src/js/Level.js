@@ -48,9 +48,6 @@ function GameLevel(){
   // States 
   this.paused = false;      
   this.gameover = false;
-  
-  // TODO remove
-  this.test_cube;
 }
 
 /** Initialize level */
@@ -152,20 +149,6 @@ GameLevel.prototype.init = function (w,h){
   
   /** Other */
   this.player.init(this);
-
-  /** TODO test stuff  */
-  var mapHeight = THREE.ImageUtils.loadTexture( 'res/test2.png' );
-  mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
-  mapHeight.format = THREE.RGBFormat;
-  material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: true });
-  var cube = new THREE.CubeGeometry( 250,250,250); 
-  var mesh = new THREE.Mesh(cube, material);
-  mesh.position.x = w/2 - 150;
-  mesh.position.y = h/2;
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  this.test_cube = mesh;
-  //this.scene.add(this.test_cube);
 }
 
 /** Update the state of the level */

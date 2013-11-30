@@ -11,6 +11,9 @@ function Hud(){
   
   this.pauseSprite;       // Used to draw paused text to screen
   this.gameoverSprite;    // Gameover text to draw 
+  
+  this.draw_warning = false;
+  this.warningSprite;
 }
 
 /** Initialize hud **/
@@ -46,6 +49,16 @@ Hud.prototype.init = function(w, h){
 	this.gameoverSprite.position.set( w/2, h/2, 0 );
 	this.gameoverSprite.scale.set( 400, 150, 1.0 );
 	this.scene.add( this.gameoverSprite  );
+  
+  /** Setup warning */
+  texture = THREE.ImageUtils.loadTexture( 'res/warn.png' );
+	material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+  material.transparent = true;
+  material.opacity = 1;
+	this.warningSprite  = new THREE.Sprite( material );
+	this.warningSprite.position.set( w/2, h/2, 0 );
+	this.warningSprite.scale.set( 150, 75, 1.0 );
+	this.scene.add( this.warningSprite  );
 }
 
 /** Update hud state **/
@@ -82,6 +95,12 @@ Hud.prototype.update = function(){
     if (this.tutSprite.material.opacity < 0)
       this.tutSprite.material.opacity = 0;
   }
+  
+  // Find out if warning should be drawn
+  if (level.player.nx < level.level_left() + 200 && !level.gameover)
+    this.warningSprite.material.opacity = 1;
+  else 
+    this.warningSprite.material.opacity = 0;
 }
 
 /** Draw hud **/
