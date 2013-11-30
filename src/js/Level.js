@@ -170,6 +170,10 @@ GameLevel.prototype.init = function (w,h){
 
 /** Update the state of the level */
 GameLevel.prototype.update = function(){
+  // Stop game if gameover 
+  if (this.gameover)
+    return;
+
   // Update pause button 
   if (keyboard[KEY_P] && !keyboard_old[KEY_P])
     this.paused = !this.paused;

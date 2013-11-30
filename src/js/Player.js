@@ -190,7 +190,11 @@ Player.prototype.collisionResponse = function(){
   if (this.air_t > this.minAirtForInAir)
     this.inAir = true;
     
-  // TODO Do death checks 
+  // Do death checks 
+  if (this.mesh.position.x + this.w < level.level_left()){
+    this.alive = false;
+    level.gameover = true;
+  }
 }
 
 /** Stop player if they are jumping*/

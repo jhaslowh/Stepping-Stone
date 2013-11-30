@@ -10,6 +10,7 @@ function Hud(){
   this.tutSprite;         // Use to edit sprite values 
   
   this.pauseSprite;       // Used to draw paused text to screen
+  this.gameoverSprite;    // Gameover text to draw 
 }
 
 /** Initialize hud **/
@@ -28,13 +29,23 @@ Hud.prototype.init = function(w, h){
 	this.scene.add( this.tutSprite  );
   
   /** Set up pause **/
-  var texture = THREE.ImageUtils.loadTexture( 'res/paused.png' );
+  texture = THREE.ImageUtils.loadTexture( 'res/paused.png' );
 	material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   material.transparent = true;
 	this.pauseSprite  = new THREE.Sprite( material );
 	this.pauseSprite.position.set( w/2, h/2, 0 );
 	this.pauseSprite.scale.set( 300, 100, 1.0 );
 	this.scene.add( this.pauseSprite  );
+  
+  /** Setup gameover */
+  texture = THREE.ImageUtils.loadTexture( 'res/gameover.png' );
+	material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+  material.transparent = true;
+  material.opacity = 0;
+	this.gameoverSprite  = new THREE.Sprite( material );
+	this.gameoverSprite.position.set( w/2, h/2, 0 );
+	this.gameoverSprite.scale.set( 400, 150, 1.0 );
+	this.scene.add( this.gameoverSprite  );
 }
 
 /** Update hud state **/
@@ -56,6 +67,12 @@ Hud.prototype.update = function(){
     this.show_tut = false;
     this.pauseSprite.material.opacity = 0;
   }
+  
+  // Show gameover text
+  if (level.gameover)
+    this.gameoverSprite.material.opacity = 1;
+  else
+    this.gameoverSprite.material.opacity = 0;
   
   // Fade tut if not shown 
   if (this.show_tut || this.tutTime > 0)
