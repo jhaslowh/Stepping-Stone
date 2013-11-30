@@ -335,7 +335,10 @@ GameLevel.prototype.generateChunk = function (){
         else if (j >= this.grid_water_level - 1)
           block_grid[i][j] = BlockType.Sand;
         else 
-          block_grid[i][j] = BlockType.Rock;
+          if (block_grid[i][j-1] == BlockType.NoBlock)
+            block_grid[i][j] = BlockType.Dirt;
+          else
+            block_grid[i][j] = BlockType.Rock;
       }
       
       // Turn off path if it is set off 
