@@ -25,6 +25,7 @@ function Player(){
   this.pass_x = true;
   this.pass_y = true;
   this.in_water = false;
+  this.allow_roof_climbing = true;
 }
 
 /** Initialize player values */
@@ -139,7 +140,7 @@ Player.prototype.checkCollision = function(level){
   
   // Level collision
   if (this.ny + this.h > level.level_bottom()){
-    //this.mesh.position.y = level.level_bottom() - this.h;
+    this.mesh.position.y = level.level_bottom() - this.h;
     this.pass_y = false;
   }
   /*else if (this.ny < level.level_top()){
@@ -157,16 +158,29 @@ Player.prototype.checkCollision = function(level){
     // Make sure block is alive and not null
     if (level.blocks[i].active && level.blocks[i].collides){
       // x axis collision check 
-      if (this.checkBlockX(level.blocks[i])){
+      if (this.checkBlockX(level.blocks[i]) && this.pass_x){
+        // Small collision response 
+        if (level.blocks[i].x < this.nx)
+          this.mesh.position.x = level.blocks[i].x + level.blocks[i].width + .5;
+        else if (level.blocks[i].x > this.nx)
+          this.mesh.position.x = level.blocks[i].x - this.w - .5;
+        // Set collision flag 
         this.pass_x = false;
       }
       
       // y axis collision check 
-      if (this.checkBlockY(level.blocks[i])){
-        // Might need this
-        // this.mesh.position.y = level.blocks[i].y - this.h;
+      if (this.checkBlockY(level.blocks[i]) && this.pass_y){
+        // Small collision response 
+        if (level.blocks[i].y < this.ny){
+          this.hitCeiling();
+          this.mesh.position.y = level.blocks[i].y + level.blocks[i].height + .5;
+        }
+        else if (level.blocks[i].y > this.ny){
+          this.hitGround();
+          this.mesh.position.y = level.blocks[i].y - this.h - .5;
+        }
         
-        this.hitGround();
+        // Set collision flag 
         this.pass_y = false;
       }
     }
@@ -181,10 +195,6 @@ Player.prototype.collisionResponse = function(){
   
   if (this.pass_y)
     this.mesh.position.y = this.ny;
-    
-  // Stop jump if hits wall 
-  if (!this.pass_y && this.jumping)
-    this.stopJump();
     
   // Air check 
   if (this.air_t > this.minAirtForInAir)
@@ -209,6 +219,16 @@ Player.prototype.hitGround = function(){
   this.air_t = 0;
   this.yo = this.mesh.position.y;
   this.inAir = false;
+  this.jumping = false;
+}
+
+/** Call when the player hits the ceiling **/
+Player.prototype.hitCeiling = function(){
+  this.air_t = 0;
+  this.yo = this.mesh.position.y;
+  // If inAir is set false here, player will be able to roof climb. 
+  // if it is true, they will not. 
+  this.inAir = !this.allow_roof_climbing; 
   this.jumping = false;
 }
 
