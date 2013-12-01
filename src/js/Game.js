@@ -11,6 +11,7 @@ var level = new GameLevel();
 var time_step = .016;
 var WIDTH = 0, HEIGHT = 0;
 var hud = new Hud();
+var debug = new Debug();
 
 // Three.js variables 
 var renderer;
@@ -26,6 +27,7 @@ function init(){
   // Set up level 
   level.init(WIDTH,HEIGHT);
   hud.init(WIDTH, HEIGHT);
+  debug.init();
 
   /** Setup renderer */
   // Create Renderer
@@ -65,6 +67,7 @@ function gameLoop()
   // Update
   level.update();
   hud.update();
+  debug.update();
   updateKeyboardButtons();
   
   // Render

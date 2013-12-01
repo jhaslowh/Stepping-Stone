@@ -5,6 +5,16 @@ var KEY_LEFT = 37;
 var KEY_UP = 38;
 var KEY_RIGHT = 39;
 var KEY_DOWN = 40;
+var KEY_0 = 48;
+var KEY_1 = 49;
+var KEY_2 = 50;
+var KEY_3 = 51;
+var KEY_4 = 52;
+var KEY_5 = 53;
+var KEY_6 = 54;
+var KEY_7 = 55;
+var KEY_8 = 56;
+var KEY_9 = 57;
 var KEY_A = 65;
 var KEY_B = 66;
 var KEY_C = 67;
@@ -31,6 +41,7 @@ var KEY_W = 87;
 var KEY_X = 88;
 var KEY_Y = 89;
 var KEY_Z = 90;
+var KEY_TILDE = 192;
 
 /** Initialize IO elements */
 function initIO(){
@@ -73,16 +84,24 @@ function addKeyboardEvents()
   });
 }
 
+/** Check if a key was just pressed **/
+function keyPressed(key){
+  if (keyboard[key] && !keyboard_old[key])
+    return true;
+  return false;
+}
+
 /** Update the key states of the keyboard **/
 function updateKeyboardButtons(){
-  for (var i = 65; i < 90; i++){
+  for (var i = 65; i < 90; i++)
     keyboard_old[i] = keyboard[i];
-  }
-  
+  for (var i = 48; i < 58; i++)
+    keyboard_old[i] = keyboard[i];
   keyboard_old[16] = keyboard[16];
   keyboard_old[32] = keyboard[32];
   keyboard_old[37] = keyboard[37];
   keyboard_old[38] = keyboard[38];
   keyboard_old[39] = keyboard[39];
   keyboard_old[40] = keyboard[40];
+  keyboard_old[192] = keyboard[192];
 }

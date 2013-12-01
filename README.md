@@ -33,6 +33,9 @@ I/O File for the game. Handles keyboard and mouse.
 * Hud.js ::
 Does 2D screen drawing for the game. 
 
+* Debug.js ::
+Adds some debugging features to make showing the game in class easier. 
+
 **Controls**
 
 AWSD  : Move the player
