@@ -17,7 +17,8 @@ var BlockType = {
   "Rock": 3,
   "UnderWRock": 4,
   "Sand": 5,
-  "Dirt": 6
+  "Dirt": 6,
+  "DirtGrass": 7
 };
 
 /** Update block */
@@ -140,7 +141,7 @@ function generateBlock(type, x, y, chunk){
       
     return new Block(x,y,type);
   }
-  else if (type == BlockType.Dirt){
+  else if (type == BlockType.Dirt || type == BlockType.DirtGrass){
     var cube = new THREE.CubeGeometry( 25,25,25); 
     var mesh = new THREE.Mesh(cube, dirt_material);
     mesh.position.x = x + 12;
@@ -158,19 +159,21 @@ function generateBlock(type, x, y, chunk){
     }
     
     // Make grass 
-    cube = new THREE.CubeGeometry( 25,6,25); 
-    mesh = new THREE.Mesh(cube, grass_material);
-    mesh.position.x = x + 12;
-    mesh.position.y = y - 3;
-    mesh.receiveShadow = true;
-    
-    // Put path into chunk 
-    if (chunk.grass_mesh == 0)
-      chunk.grass_mesh = mesh;
-    else {
-      mesh.position.x -= chunk.grass_mesh.position.x;
-      mesh.position.y -= chunk.grass_mesh.position.y;
-      THREE.GeometryUtils.merge(chunk.grass_mesh.geometry, mesh);
+    if (type == BlockType.DirtGrass){
+      cube = new THREE.CubeGeometry( 25,6,25); 
+      mesh = new THREE.Mesh(cube, grass_material);
+      mesh.position.x = x + 12;
+      mesh.position.y = y - 3;
+      mesh.receiveShadow = true;
+      
+      // Put path into chunk 
+      if (chunk.grass_mesh == 0)
+        chunk.grass_mesh = mesh;
+      else {
+        mesh.position.x -= chunk.grass_mesh.position.x;
+        mesh.position.y -= chunk.grass_mesh.position.y;
+        THREE.GeometryUtils.merge(chunk.grass_mesh.geometry, mesh);
+      }
     }
       
     return new Block(x,y,type);

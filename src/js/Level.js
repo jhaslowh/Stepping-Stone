@@ -306,9 +306,15 @@ GameLevel.prototype.generateChunk = function (){
         else if (j >= this.grid_water_level - 1)
           block_grid[i][j] = BlockType.Sand;
         else 
+          // Grass and Dirt 
           if (block_grid[i][j-1] == BlockType.NoBlock ||
-              block_grid[i][j-1] == BlockType.Path)
-            block_grid[i][j] = BlockType.Dirt;
+              block_grid[i][j-1] == BlockType.Path){
+            block_grid[i][j] = BlockType.DirtGrass;
+            
+            // Make more dirt to make it more dynamic 
+            if (block_grid[i][j+1] == BlockType.Auto && Math.random() < .31)
+              block_grid[i][j+1] = BlockType.Dirt;
+          }
           else
             block_grid[i][j] = BlockType.Rock;
       }
