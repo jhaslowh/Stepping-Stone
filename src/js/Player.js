@@ -11,6 +11,8 @@ function Player(){
   this.speed = 5;
   this.mesh;
   
+  this.mouse_min_move = 25;
+  
   // Physics 
   this.jumpt = 0;
   this.yo = 0;
@@ -70,11 +72,11 @@ Player.prototype.update = function(level){
       this.in_water = false;
       
       // Update controls 
-      if (keyboard[KEY_D])
+      if (keyboard[KEY_D] || (mouse.left_down && mouse.x > mouse.down_x + this.mouse_min_move))
         this.nx += this.speed;
-      if (keyboard[KEY_A])
+      if (keyboard[KEY_A] || (mouse.left_down && mouse.x < mouse.down_x - this.mouse_min_move))
         this.nx -= this.speed;
-      if (keyboard[KEY_W]){
+      if (keyboard[KEY_W] || (mouse.left_down && mouse.y < mouse.down_y + this.mouse_min_move)){
         // See if player can jump 
         if (!this.jumping && !this.inAir){
           // Set up physics 
@@ -111,13 +113,13 @@ Player.prototype.update = function(level){
       this.in_water = true;
       
       // Update controls 
-      if (keyboard[KEY_D])
+      if (keyboard[KEY_D] || (mouse.left_down && mouse.x > mouse.down_x + this.mouse_min_move))
         this.nx += this.speed;
-      if (keyboard[KEY_A])
+      if (keyboard[KEY_A] || (mouse.left_down && mouse.x < mouse.down_x - this.mouse_min_move))
         this.nx -= this.speed;
-      if (keyboard[KEY_S])
+      if (keyboard[KEY_S] || (mouse.left_down && mouse.y > mouse.down_y + this.mouse_min_move))
         this.ny += this.speed;
-      if (keyboard[KEY_W])
+      if (keyboard[KEY_W] || (mouse.left_down && mouse.y < mouse.down_y - this.mouse_min_move))
         this.ny -= this.speed;
         
       // Water gravity 

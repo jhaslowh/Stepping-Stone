@@ -3,7 +3,12 @@
 // Input 
 var keyboard = {};
 var keyboard_old = {};
-var mouse = {x:0, y:0};
+var mouse = {
+  x:0, 
+  y:0, 
+  left_down: false, left_down_old: false,
+  down_x: 0,
+  down_y:0};
 
 // Game variables 
 var gameState = "playing";
@@ -68,7 +73,7 @@ function gameLoop()
   level.update();
   hud.update();
   debug.update();
-  updateKeyboardButtons();
+  updateButtons();
   
   // Render
   renderer.clear();

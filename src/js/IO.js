@@ -63,10 +63,26 @@ function addEvent(node, name, func)
 /** Add mouse events to the game */
 function addMouseEvents()
 {
+  addEvent(document, "mousemove", function(e){
+    mouse.x = e.clientX-renderer.domElement.getBoundingClientRect().left;
+    mouse.y = e.clientY-renderer.domElement.getBoundingClientRect().top;
+    });
   addEvent(document, "mousedown", function(e){
-      mouse = {
-    x:(e.clientX-renderer.domElement.getBoundingClientRect().left), 
-    y:(e.clientY-renderer.domElement.getBoundingClientRect().top)};
+    mouse.x = e.clientX-renderer.domElement.getBoundingClientRect().left;
+    mouse.y = e.clientY-renderer.domElement.getBoundingClientRect().top;
+    if (e.button == 0 && mouse.left_down_old == false){
+      mouse.left_down = true;
+      mouse.down_x = mouse.x;
+      mouse.down_y = mouse.y;
+    }
+  });
+  
+  addEvent(document, "mouseup", function(e){
+    mouse.x = e.clientX-renderer.domElement.getBoundingClientRect().left;
+    mouse.y = e.clientY-renderer.domElement.getBoundingClientRect().top;
+    if (e.button == 0){
+      mouse.left_down = false;
+    }
   });
 }
 
@@ -91,8 +107,8 @@ function keyPressed(key){
   return false;
 }
 
-/** Update the key states of the keyboard **/
-function updateKeyboardButtons(){
+/** Update the button old states **/
+function updateButtons(){
   for (var i = 65; i < 90; i++)
     keyboard_old[i] = keyboard[i];
   for (var i = 48; i < 58; i++)
@@ -104,4 +120,5 @@ function updateKeyboardButtons(){
   keyboard_old[39] = keyboard[39];
   keyboard_old[40] = keyboard[40];
   keyboard_old[192] = keyboard[192];
+  mouse.left_down_old = mouse.left_down;
 }

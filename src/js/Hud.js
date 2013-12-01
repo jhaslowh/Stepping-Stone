@@ -1,3 +1,8 @@
+/**
+ * NOTE: 0,0 is in the bottom left corner for this camera. 
+ * Positive x is right and positive y is up 
+ **/
+
 /** Structure to hold hud data **/
 function Hud(){
   this.camera;      // Camera to draw all hud elements 
@@ -11,6 +16,7 @@ function Hud(){
   
   this.pauseSprite;       // Used to draw paused text to screen
   this.gameoverSprite;    // Gameover text to draw 
+  this.mouseSprite;
   
   this.draw_warning = false;
   this.warningSprite;
@@ -59,6 +65,16 @@ Hud.prototype.init = function(w, h){
 	this.warningSprite.position.set( w/2, h/2, 0 );
 	this.warningSprite.scale.set( 150, 75, 1.0 );
 	this.scene.add( this.warningSprite  );
+  
+  /** Mouse warning */
+  texture = THREE.ImageUtils.loadTexture( 'res/mouseDown.png' );
+	material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+  material.transparent = true;
+  material.opacity = 0;
+	this.mouseSprite  = new THREE.Sprite( material );
+	this.mouseSprite.position.set( w/2, h/2, 0 );
+	this.mouseSprite.scale.set( 200, 200, 1.0 );
+	this.scene.add( this.mouseSprite  );
 }
 
 /** Update hud state **/
@@ -101,6 +117,14 @@ Hud.prototype.update = function(){
     this.warningSprite.material.opacity = 1;
   else 
     this.warningSprite.material.opacity = 0;
+    
+  // Update Mouse Display 
+  if (mouse.left_down){
+    this.mouseSprite.position.set( mouse.down_x, HEIGHT - mouse.down_y, 0 );
+    this.mouseSprite.material.opacity = 1;
+  }
+  else
+    this.mouseSprite.material.opacity = 0; 
 }
 
 /** Draw hud **/
