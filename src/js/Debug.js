@@ -3,6 +3,7 @@
  * 1 = Turn on bump cube 
  * 2 = Lock Player 
  * 3 = Show Correct Paths 
+ * 4 = Enable/Disable ceiling climbing
  **/
 
 /** Debug structure **/
@@ -37,8 +38,8 @@ Debug.prototype.init = function(){
 	var material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   material.transparent = true;
 	this.debugMenu  = new THREE.Sprite( material );
-	this.debugMenu.position.set( WIDTH - 124, HEIGHT - 72, 0 );
-	this.debugMenu.scale.set( 228, 134, 1.0 );
+	this.debugMenu.position.set( WIDTH - 124, HEIGHT - 82, 0 );
+	this.debugMenu.scale.set( 228, 154, 1.0 );
 }
 
 /** Update Debug controls **/
@@ -74,6 +75,9 @@ Debug.prototype.update = function(){
     // Turn on off correct path 
     if (keyPressed(KEY_3))
       level.draw_correct_path = !level.draw_correct_path;
+    // Turn on/off wall climbing 
+    if (keyPressed(KEY_4))
+      level.player.allow_roof_climbing = !level.player.allow_roof_climbing;
     
     // Turn off debug mode 
     if (keyPressed(KEY_TILDE)){
