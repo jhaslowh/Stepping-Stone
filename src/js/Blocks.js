@@ -29,6 +29,11 @@ Block.prototype.update = function(level){
   }
 }
 
+/** Called when the player collides with the block **/
+Block.prototype.collide = function(){
+  // TODO 
+}
+
 /** ================================================= **/
 /** ======== Block Generation ======================= **/
 /** ================================================= **/

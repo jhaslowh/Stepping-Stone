@@ -217,6 +217,8 @@ Player.prototype.checkCollision = function(level){
           this.mesh.position.x = level.blocks[i].x - this.w - .5;
         // Set collision flag 
         this.pass_x = false;
+        
+        level.blocks[i].collide();
       }
       
       // y axis collision check 
@@ -233,6 +235,8 @@ Player.prototype.checkCollision = function(level){
         
         // Set collision flag 
         this.pass_y = false;
+        
+        level.blocks[i].collide();
       }
     }
   }
