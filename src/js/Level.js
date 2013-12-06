@@ -10,7 +10,7 @@ function GameLevel(){
   // Water
   this.water_cube;            // Mesh for water. 
   this.water_level;           // Y value for sea level. set in init()
-  this.water_size = 2000;     // Width for water and sea floor.
+  this.water_size = 4000;     // Width for water and sea floor.
   this.sea_floor;             // Sea floor mesh, created in init()
   this.sea_floor_2;             
   // Lights
@@ -35,8 +35,6 @@ function GameLevel(){
   this.hor_blocks;       // Number of horozontal blocks per chunk
   this.gen_top;          // Top of generation range 
   this.gen_bottom;       // Bottom of generation range (bottom box y value plus height)
-  this.screen_width;     // Width of screen 
-  this.screen_height;    // height of screen 
   this.block_list_full = false; // used in index method to make it faster 
   // Row of last path block placed 
   this.last_path_block = -1;  // Last y index value in grid for path generation 
@@ -45,6 +43,9 @@ function GameLevel(){
   this.under_path_percent = .4; // Chance to generate a block under the path if above water
   this.chunks_per_gen = 25;        // Number of chunks to generate each call to gen chunk.
   this.block_overflow_grid;   // Overflow grid so that we dont get strait lines on chunk seems
+  this.level_width = 0;
+  this.level_height = 1000;
+  this.gen_chunk_width = 2500; // Width of a chunk 
   
   // States 
   this.paused = false;      
@@ -53,13 +54,16 @@ function GameLevel(){
 
 /** Initialize level */
 GameLevel.prototype.init = function (w,h){
+
+  this.level_width = Math.round(this.level_height * (w/h));
+  
   /** Set up rendering Code */
   // Move camera to middle of level width and height 
-  this.camera_loc.x = w/2;
-  this.camera_loc.y = h/2;
+  this.camera_loc.x = this.level_width /2;
+  this.camera_loc.y = this.level_height /2;
   /* Set the camera z based on the screen width, 
    * so the whole level can be seen. */
-  this.camera_zoom = -((h/2) / Math.tan((Math.PI * 22.5)/180)); 
+  this.camera_zoom = -((this.level_height/2) / Math.tan((Math.PI * 22.5)/180)); 
   
   // Create Camera 
   this.camera = new THREE.PerspectiveCamera(
@@ -78,15 +82,12 @@ GameLevel.prototype.init = function (w,h){
   this.scene = new THREE.Scene();
   
   /** Set up generation code */
-  // Set level width and height
-  this.screen_width = w;
-  this.screen_height = h;
-  this.next_gen_loc = w;
+  this.next_gen_loc = this.camera_loc.x + (this.level_width / 2);
   // Get the number of blocks that fit on the screen vertically divided by 2
-  this.vert_blocks = Math.round((h / 25)) - 4;
-  this.hor_blocks = Math.round((w/ 25));
-  this.gen_top = (h/2) - ((this.vert_blocks * 25)/2);
-  this.gen_bottom = (h/2) + ((this.vert_blocks * 25)/2);
+  this.vert_blocks = Math.round((this.level_height / 25)) - 4;
+  this.hor_blocks = Math.round((this.gen_chunk_width/ 25));
+  this.gen_top = (this.level_height /2) - ((this.vert_blocks * 25)/2);
+  this.gen_bottom = (this.level_height /2) + ((this.vert_blocks * 25)/2);
   this.grid_water_level = Math.round(this.vert_blocks/2);
   this.last_path_block = this.grid_water_level + 1;
   this.last_path_block2 = this.grid_water_level + 1;
@@ -97,9 +98,9 @@ GameLevel.prototype.init = function (w,h){
   this.generateChunk();
   
   /** Set up water */
-  this.water_level = h/2;
+  this.water_level = this.level_height /2;
   // Water shape for now will be the width plus 200, 1000 height, and 160 depth. 
-  var c = new THREE.CubeGeometry(this.water_size, this.gen_bottom - (h/2), 160); 
+  var c = new THREE.CubeGeometry(this.water_size, this.gen_bottom - (this.level_height /2), 160); 
   var material = new THREE.MeshLambertMaterial( { color: 0x00CAFC} );
   material.opacity = .15;
   material.transparent = true;
@@ -141,9 +142,9 @@ GameLevel.prototype.init = function (w,h){
   this.direct_light.shadowCameraNear = 2;
   this.direct_light.shadowCameraFar = 5000;
   // This is the size of the area the shadow will cover 
-  var shadow_box_size = ((w/2)+150);
-  this.direct_light.shadowCameraLeft = -shadow_box_size;
-  this.direct_light.shadowCameraRight = shadow_box_size;
+  var shadow_box_size = ((w /2)+150);
+  this.direct_light.shadowCameraLeft = -this.water_size/2;
+  this.direct_light.shadowCameraRight = this.water_size/2;
   this.direct_light.shadowCameraTop = shadow_box_size;
   this.direct_light.shadowCameraBottom = -shadow_box_size;
   //this.direct_light.shadowCameraVisible = true; // Use this for debugging shadows 
