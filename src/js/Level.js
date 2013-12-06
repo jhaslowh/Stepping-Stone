@@ -17,6 +17,10 @@ function GameLevel(){
   this.hem_light;             
   this.direct_light;
   
+  // Scoring
+  this.score = 0;
+  this.score_per_unit = 1;    // Score multiplier 
+  
   // Rendering 
   this.camera;
   this.camera_move_speed = 1; // The camera will move to the right, player must keep up
@@ -181,6 +185,8 @@ GameLevel.prototype.update = function(){
     this.camera_loc.x += this.camera_move_speed;
     this.fix_water_loc();
     this.fix_light_loc();
+    
+    this.score += this.score_per_unit * this.camera_move_speed;
     
     // Update Player
     this.player.update(this);
