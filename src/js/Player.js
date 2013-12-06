@@ -11,6 +11,17 @@ function Player(){
   this.speed = 5;
   this.mesh;
   
+  // Shield
+  this.meshShield;
+  // How long the shield is currently on for. Set to (shield time to set)
+  this.shieldCurrentTime = 0;   
+  // Time shield will stay on for
+  this.shieldTime = 2;      
+  // Current recharge time of the shield, if == to sheild recharge, then player can use shield   
+  this.shieldCurrentRecharge = 10;
+  // Time until shield can be used again
+  this.shieldRecharge = 10;      
+  
   this.mouse_min_move = 25;
   
   // Physics 
@@ -57,12 +68,24 @@ Player.prototype.init = function(level){
   this.mesh.castShadow = true;
   this.mesh.receiveShadow = true;
   level.scene.add(this.mesh);
+  
+  /** Make shield **/
+  var circle = new THREE.SphereGeometry(30, 25, 25);
+  var texture = THREE.ImageUtils.loadTexture( 'res/shield.png' );
+  texture.format = THREE.RGBFormat;
+  material = new THREE.MeshPhongMaterial({color: 0xffffff,map:texture});
+  material.opacity = .5;
+  material.transparent = true;
+  this.meshShield = new THREE.Mesh(circle, material);
+  level.scene.add(this.meshShield);
+  this.meshShield.position.z = 1;
 }
 
 /** Update player state */
 Player.prototype.update = function(level){
   if (this.alive){
     /** Update Location */
+    
     // Grab location 
     this.nx = this.mesh.position.x;
     this.ny = this.mesh.position.y;
@@ -131,6 +154,32 @@ Player.prototype.update = function(level){
     
     /** Collision Response */
     this.collisionResponse();
+    
+    /** Update Shield **/
+    this.meshShield.rotation.z += .01;
+    this.meshShield.rotation.x += .01;
+    
+    // Check to see if player is trying to turn on shield 
+    if (keyboard[KEY_SPACE] && this.shieldCurrentRecharge == this.shieldRecharge){
+      this.shieldCurrentRecharge = 0;
+      this.shieldCurrentTime = this.shieldTime;
+    }
+    
+    // Update shield state 
+    if (this.shieldCurrentTime != 0){
+      this.shieldCurrentTime -= time_step;
+      if (this.shieldCurrentTime < 0)
+        this.shieldCurrentTime = 0;
+    }
+    else if (this.shieldCurrentRecharge != this.shieldRecharge){
+      this.shieldCurrentRecharge += time_step;
+      if (this.shieldCurrentRecharge > this.shieldRecharge)
+        this.shieldCurrentRecharge = this.shieldRecharge;
+    }
+    
+    // Check if shield is on 
+    if (this.shieldCurrentTime != 0) this.meshShield.material.opacity = .5;
+    else this.meshShield.material.opacity = 0;
   }
 }
 
@@ -152,7 +201,7 @@ Player.prototype.checkCollision = function(level){
   
   // Check if the player was above water and lands in it
   if (this.in_water == false && this.ny > level.water_level - (this.h/2)){
-    this.hitGround();
+    this.hitWater();
   }
   
   // Block collision checks
@@ -207,6 +256,10 @@ Player.prototype.collisionResponse = function(){
     this.alive = false;
     level.gameover = true;
   }
+  
+  // Fix shield location 
+  this.meshShield.position.x = this.mesh.position.x + 24;
+  this.meshShield.position.y = this.mesh.position.y + 12;
 }
 
 /** Stop player if they are jumping*/
@@ -232,6 +285,11 @@ Player.prototype.hitCeiling = function(){
   // if it is true, they will not. 
   this.inAir = !this.allow_roof_climbing; 
   this.jumping = false;
+}
+
+/** Called when player hits the surface of water **/
+Player.prototype.hitWater = function(){
+  this.hitGround();
 }
 
 /** Check block collision on x axis **/

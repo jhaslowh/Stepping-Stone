@@ -20,6 +20,9 @@ function Hud(){
   
   this.draw_warning = false;
   this.warningSprite;
+  
+  this.shieldBar;
+  this.shieldOutline;
 }
 
 /** Initialize hud **/
@@ -75,6 +78,21 @@ Hud.prototype.init = function(w, h){
 	this.mouseSprite.position.set( w/2, h/2, 0 );
 	this.mouseSprite.scale.set( 200, 200, 1.0 );
 	this.scene.add( this.mouseSprite  );
+  
+  /** Shield **/
+  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_bar.png' );
+	material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+	this.shieldBar  = new THREE.Sprite( material );
+	this.shieldBar.position.set( w/2, h - 25, 0 );
+	this.shieldBar.scale.set( 100, 20, 1.0 );
+	this.scene.add( this.shieldBar  );
+  
+  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_outline.png' );
+	material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+	this.shieldOutline  = new THREE.Sprite( material );
+	this.shieldOutline.position.set( w/2, h - 25, 0 );
+	this.shieldOutline.scale.set( 120, 40, 1.0 );
+	this.scene.add( this.shieldOutline  );
 }
 
 /** Update hud state **/
@@ -125,6 +143,9 @@ Hud.prototype.update = function(){
   }
   else
     this.mouseSprite.material.opacity = 0; 
+    
+  // Update shield state 
+	this.shieldBar.scale.set( (level.player.shieldCurrentRecharge / level.player.shieldRecharge) * 100, 20, 1.0 );
 }
 
 /** Draw hud **/
