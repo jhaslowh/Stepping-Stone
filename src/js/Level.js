@@ -24,6 +24,8 @@ function GameLevel(){
   // Rendering 
   this.camera;
   this.camera_move_speed = 1; // The camera will move to the right, player must keep up
+  this.camera_speed_max = 3;  // Max allowed camera speed 
+  this.camera_accel = .005;    // Camera acceleration per second 
   this.camera_loc = {x:0,y:0};// Current camera location. Controled by level
   this.camera_zoom;           // Zoom for camera, auto calculated in init()
   this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
@@ -51,6 +53,7 @@ function GameLevel(){
   this.level_height = 1000;
   this.gen_chunk_width = 2500; // Width of a chunk 
   this.pattern_types = 8; // Total number of patterns
+  this.percent_for_timedrop = .1; // Percentage change to drop a time box 
   
   // States 
   this.paused = false;      
@@ -182,6 +185,10 @@ GameLevel.prototype.update = function(){
         this.camera_tilt = this.camera_max_tilt;
     }
     
+    // Update camera movement 
+    this.camera_move_speed += this.camera_accel * time_step;
+    if (this.camera_move_speed > this.camera_speed_max)
+      this.camera_move_speed = this.camera_speed_max;
     this.camera_loc.x += this.camera_move_speed;
     this.fix_water_loc();
     this.fix_light_loc();
@@ -264,6 +271,13 @@ GameLevel.prototype.level_top = function(){
   return this.gen_top;
 }
 
+/** Call when a time drop is picked up **/
+GameLevel.prototype.timeDropPickedUp = function(){
+  this.camera_move_speed -= .1;
+  if (this.camera_move_speed < 1)
+    this.camera_move_speed = 1;
+}
+
 /** ========================================================= **/
 /** =================== Block Generation ==================== **/
 /** ========================================================= **/
@@ -305,22 +319,22 @@ GameLevel.prototype.generateChunk = function (){
       /** Process Blocks **/
       // Set block type based off of height 
       if (block_grid[i][j] == BlockType.Auto){
-        if (j > (this.grid_water_level-1) + 3)
+        if (this.clearAbove(block_grid, i, j) && Math.random() < this.percent_for_timedrop)
+          block_grid[i][j] = BlockType.Time;
+        else if (j > (this.grid_water_level-1) + 3)
           block_grid[i][j] = BlockType.UnderWRock;
         else if (j >= this.grid_water_level - 1)
           block_grid[i][j] = BlockType.Sand;
-        else 
-          // Grass and Dirt 
-          if (block_grid[i][j-1] == BlockType.NoBlock ||
+        else if (block_grid[i][j-1] == BlockType.NoBlock ||
               block_grid[i][j-1] == BlockType.Path || j-1 < 0){
-            block_grid[i][j] = BlockType.DirtGrass;
-            
-            // Make more dirt to make it more dynamic 
-            if (block_grid[i][j+1] == BlockType.Auto && Math.random() < .31)
-              block_grid[i][j+1] = BlockType.Dirt;
-          }
-          else
-            block_grid[i][j] = BlockType.Rock;
+          block_grid[i][j] = BlockType.DirtGrass;
+          
+          // Make more dirt to make it more dynamic 
+          if (block_grid[i][j+1] == BlockType.Auto && Math.random() < .31)
+            block_grid[i][j+1] = BlockType.Dirt;
+        }
+        else
+          block_grid[i][j] = BlockType.Rock;
       }
       
       // Turn off path if it is set off 
@@ -341,23 +355,6 @@ GameLevel.prototype.generateChunk = function (){
   this.chunks[chunk_index].finish(this.scene);
   // Move next gen spot 
   this.next_gen_loc += this.hor_blocks * 25;
-  
-  // Test Blocks (only keeping for size testing and reference. )
-  /*for (var i = 0; i < this.vert_blocks; i++){
-    var block = generateBlock(BlockType.Rock, i * 25,this.gen_top+( i * 25));
-    this.blocks.push(block);
-    var mesh = block.mesh;
-    this.scene.add(mesh);
-    var block = generateBlock(BlockType.Rock, 0,this.gen_top+( i * 25));
-    mesh = block.mesh;
-    this.blocks.push(block);
-    this.scene.add(mesh);
-  }
-  
-  for (var i = 0; i < this.hor_blocks; i++){
-    var mesh = generateBlock(BlockType.Rock, i * 25,this.gen_top).mesh;
-    this.scene.add(mesh);
-  }*/
 }
 
 /** Generate a correct path **/
@@ -445,6 +442,25 @@ GameLevel.prototype.resetOverflowGrid = function(){
     for (var j = 0; j < this.vert_blocks; j++)
       this.block_overflow_grid[i][j] = BlockType.NoBlock;
   }
+}
+
+/** Check if the blocks above a block are clear **/
+GameLevel.prototype.clearAbove = function(grid, i, j){
+  if (this.isEmptySpace(grid, i-1,j) && this.isEmptySpace(grid, i-1,j-1) && this.isEmptySpace(grid, i,j-1) && this.isEmptySpace(grid, i+1,j-1) && this.isEmptySpace(grid, i+1,j)) 
+    return true;
+  return false;
+}
+
+/** Return true if spot in grid is an empty space **/
+GameLevel.prototype.isEmptySpace = function(grid, i, j){
+  if (j < 0 || i >= this.hor_blocks || i < 0){
+    return true;
+  }
+  if (grid[i][j] == BlockType.NoBlock ||
+    grid[i][j] == BlockType.Path){
+    return true;
+  }
+  return false;
 }
 
 /** Helper method to set a block in a block grid. 
