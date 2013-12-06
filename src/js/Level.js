@@ -189,7 +189,7 @@ GameLevel.prototype.update = function(){
       this.blocks[i].update(this);
       
     // Block generation 
-    if (this.camera_loc.x + this.screen_width > this.next_gen_loc)
+    if (this.camera_loc.x + this.level_width > this.next_gen_loc)
       this.generateChunk();
   }
 }
@@ -239,12 +239,12 @@ GameLevel.prototype.fix_light_loc = function(){
 
 /** Get the x value of the left side of the level */
 GameLevel.prototype.level_left = function(){
-  return this.camera_loc.x - (this.screen_width/2);
+  return this.camera_loc.x - (this.level_width/2);
 }
 
 /** Get the x value of the right side of the level */
 GameLevel.prototype.level_right = function(){
-  return this.camera_loc.x + (this.screen_width/2);
+  return this.camera_loc.x + (this.level_width/2);
 }
 
 /** Get the y value of the bottom of the level */
