@@ -41,11 +41,12 @@ function GameLevel(){
   this.last_path_block2 = -1;  // Last y index value in grid for path generation 
   this.grid_water_level;      // Where in the grid the water level is 
   this.under_path_percent = .4; // Chance to generate a block under the path if above water
-  this.chunks_per_gen = 25;        // Number of chunks to generate each call to gen chunk.
+  this.chunks_per_gen = 70;        // Number of chunks to generate each call to gen chunk.
   this.block_overflow_grid;   // Overflow grid so that we dont get strait lines on chunk seems
   this.level_width = 0;
   this.level_height = 1000;
   this.gen_chunk_width = 2500; // Width of a chunk 
+  this.pattern_types = 8; // Total number of patterns
   
   // States 
   this.paused = false;      
@@ -271,13 +272,9 @@ GameLevel.prototype.generateChunk = function (){
   /** Generate obstacles */
   /** =========================== **/
   for (var i = 0; i < this.chunks_per_gen; i ++){
-    var type = Math.round(Math.random() * 2);
-    if (type == 0)
-      this.gen_rec(block_grid, BlockType.Auto);
-    else if (type == 1)
-      this.gen_type1(block_grid, BlockType.Auto);
-    else if (type == 2)
-      this.gen_type2(block_grid, BlockType.Auto);
+    var type = Math.round(Math.random() * this.pattern_types);
+    var method = "this.gen_type" + type + "(block_grid, BlockType.Auto);";
+    eval(method);
   } 
   
   /** =========================== **/
@@ -478,7 +475,7 @@ GameLevel.prototype.setPathBlockInGrid = function(grid, i, j, type){
 
 
 /** Generate a square in the grid **/
-GameLevel.prototype.gen_rec = function(grid, type){
+GameLevel.prototype.gen_type0 = function(grid, type){
   // Randomly decide top left corner for block 
   var x = Math.round(Math.random() * (this.hor_blocks - 1));
   var y = Math.round(Math.random() * (this.vert_blocks - 1));
@@ -552,8 +549,144 @@ GameLevel.prototype.gen_type2 = function(grid, type){
   this.setBlockInGrid(grid, x + 2, y + 1, type);
 }
 
+/** Generate a block shape that looks like the following 
+ *    ##
+ *     ##
+ *      ##
+ *       ##
+ **/
+GameLevel.prototype.gen_type3 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x + 1, y + 1, type);
+  this.setBlockInGrid(grid, x + 2, y + 2, type);
+  this.setBlockInGrid(grid, x + 3, y + 3, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x + 2, y + 1, type);
+  this.setBlockInGrid(grid, x + 3, y + 2, type);
+  this.setBlockInGrid(grid, x + 4, y + 3, type);
+}
 
+/** Generate a block shape that looks like the following 
+ *       #
+ *     ##
+ *     ##
+ *    #  
+ **/
+GameLevel.prototype.gen_type4 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x + 1, y - 1, type);
+  this.setBlockInGrid(grid, x + 2, y - 2, type);
+  this.setBlockInGrid(grid, x + 3, y - 3, type);
+  this.setBlockInGrid(grid, x + 1, y - 2, type);
+  this.setBlockInGrid(grid, x + 2, y - 1, type);
+}
 
+/** Generate a block shape that looks like the following 
+ *    ####
+ *     ##
+ **/
+GameLevel.prototype.gen_type5 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x + 2, y, type);
+  this.setBlockInGrid(grid, x + 3, y, type);
+  this.setBlockInGrid(grid, x + 1, y + 1, type);
+  this.setBlockInGrid(grid, x + 2, y + 1, type);
+}
+
+/** Generate a block shape that looks like the following 
+ *    ##
+ *
+ *    ##
+ *
+ *    ##
+ **/
+GameLevel.prototype.gen_type6 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x, y + 2, type);
+  this.setBlockInGrid(grid, x + 1, y + 2, type);
+  this.setBlockInGrid(grid, x, y + 4, type);
+  this.setBlockInGrid(grid, x + 1, y + 4, type);
+}
+
+/** Generate a block shape that looks like the following 
+ *    #####
+ *    #####
+ *      #
+ *      #
+ *    #####
+ **/
+GameLevel.prototype.gen_type7 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x + 2, y, type);
+  this.setBlockInGrid(grid, x + 3, y, type);
+  this.setBlockInGrid(grid, x + 4, y, type);
+  
+  this.setBlockInGrid(grid, x, y + 1, type);
+  this.setBlockInGrid(grid, x + 1, y + 1, type);
+  this.setBlockInGrid(grid, x + 2, y + 1, type);
+  this.setBlockInGrid(grid, x + 3, y + 1, type);
+  this.setBlockInGrid(grid, x + 4, y + 1, type);
+  
+  this.setBlockInGrid(grid, x + 2, y + 2, type);
+  this.setBlockInGrid(grid, x + 2, y + 3, type);
+  
+  this.setBlockInGrid(grid, x, y + 4, type);
+  this.setBlockInGrid(grid, x + 1, y + 4, type);
+  this.setBlockInGrid(grid, x + 2, y + 4, type);
+  this.setBlockInGrid(grid, x + 3, y + 4, type);
+  this.setBlockInGrid(grid, x + 4, y + 4, type);
+}
+
+/** Generate a block shape that looks like the following 
+ *    ##
+ *   ####
+ *  ##  ##
+ **/
+GameLevel.prototype.gen_type8 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+  
+  // Make shape 
+  this.setBlockInGrid(grid, x, y, type);
+  this.setBlockInGrid(grid, x + 1, y, type);
+  this.setBlockInGrid(grid, x - 1, y + 1, type);
+  this.setBlockInGrid(grid, x, y + 1, type);
+  this.setBlockInGrid(grid, x + 1, y + 1, type);
+  this.setBlockInGrid(grid, x + 2, y + 1, type);
+  this.setBlockInGrid(grid, x - 2, y + 2, type);
+  this.setBlockInGrid(grid, x - 1, y + 2, type);
+  this.setBlockInGrid(grid, x + 2, y + 2, type);
+  this.setBlockInGrid(grid, x + 3, y + 2, type);
+}
 
 
 
