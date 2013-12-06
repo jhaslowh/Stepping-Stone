@@ -293,6 +293,10 @@ Player.prototype.hitCeiling = function(){
 
 /** Called when player hits the surface of water **/
 Player.prototype.hitWater = function(){
+ // splash_sound.volume = this.air_t;
+  splash_sound.volume = this.air_t;//Volume depends on how long the player falls. Volume maxes when air_t is =>1
+  splash_sound.currentTime = 0;
+  splash_sound.play();
   this.hitGround();
 }
 
