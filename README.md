@@ -1,7 +1,7 @@
 CS 425 Final Project
 ====================
 
-TODO Name
+Stepping Stone
 ---------
 
 **Project description**
