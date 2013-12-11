@@ -58,5 +58,5 @@ Currently using 2 spaces for each tab, if this is a problem we an switch to 4 sp
 
 * [Slime Splash Sound](http://soundbible.com/1097-Slime-Splash.html) by Mike Koenig
 * [Laser Cannon Sound](http://soundbible.com/1771-Laser-Cannon.html) by Mike Koenig
-* 
+* [Computer Error Sound](http://soundbible.com/172-Computer-Error.html) by Mike Koenig
 

@@ -159,18 +159,31 @@ Player.prototype.update = function(level){
     this.meshShield.rotation.z += .01;
     this.meshShield.rotation.x += .01;
     
+
     // Check to see if player is trying to turn on shield 
     if (keyboard[KEY_SPACE] && this.shieldCurrentRecharge == this.shieldRecharge){
       this.shieldCurrentRecharge = 0;
       this.shieldCurrentTime = this.shieldTime;
       shield_up_sound.play();
+      
+    }
+
+    // Play a sound if the player tries to use the shiled before it is recharged
+    if ((keyboard[KEY_SPACE] && this.shieldCurrentRecharge < this.shieldRecharge)&&(this.shieldCurrentTime==0)){
+      if(shield_cooldown_sound.currentTime>0.3){
+        //let the sound play a bit before restarting it
+        shield_cooldown_sound.currentTime = 0;
+      }
+      shield_cooldown_sound.play();
     }
     
     // Update shield state 
     if (this.shieldCurrentTime != 0){
       this.shieldCurrentTime -= time_step;
-      if (this.shieldCurrentTime < 0)
+      if (this.shieldCurrentTime < 0){
         this.shieldCurrentTime = 0;
+        shield_down_sound.play();
+      }
     }
     else if (this.shieldCurrentRecharge != this.shieldRecharge){
       this.shieldCurrentRecharge += time_step;
