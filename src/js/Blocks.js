@@ -6,7 +6,9 @@ function Block(x,y,type){
   this.height = 25;
   this.block_type = type;   // Type of block 
   this.active = true;       // Set to true if block is on level, false if not. 
-  this.collides = true;     // Set to true if block collides with player 
+  this.collides = true;     // Set to true if block collides with player
+  this.picked_up = false;   // Used for power ups 
+  this.mesh = 0;
 }
 
 /** Block type list */
@@ -18,7 +20,8 @@ var BlockType = {
   "UnderWRock": 4,
   "Sand": 5,
   "Dirt": 6,
-  "DirtGrass": 7
+  "DirtGrass": 7,
+  "Time": 8
 };
 
 /** Update block */
@@ -31,7 +34,12 @@ Block.prototype.update = function(level){
 
 /** Called when the player collides with the block **/
 Block.prototype.collide = function(){
-  // TODO 
+  if (this.block_type == BlockType.Time && this.picked_up == false){
+    level.timeDropPickedUp();
+    level.scene.remove(this.mesh);
+    this.collides = false;
+    this.picked_up = true;
+  }
 }
 
 /** ================================================= **/
@@ -65,6 +73,13 @@ var dirt_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xa6
 
 // Grass material 
 var grass_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x59c964, specular: 0x333333, shininess: 0, metal: false });
+
+// Time material 
+var texture = THREE.ImageUtils.loadTexture( 'res/time.png' );
+    mapHeight = THREE.ImageUtils.loadTexture( 'res/timeb.png' );
+    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+    mapHeight.format = THREE.RGBFormat;
+var time_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xffffff, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 5, metal: false, map: texture});
 
 /** Return a block for the given type */
 function generateBlock(type, x, y, chunk){
@@ -182,6 +197,19 @@ function generateBlock(type, x, y, chunk){
     }
       
     return new Block(x,y,type);
+  }
+  else if (type == BlockType.Time){
+    var cube = new THREE.CubeGeometry( 25,25,25); 
+    var mesh = new THREE.Mesh(cube, time_material);
+    mesh.position.x = x + 12;
+    mesh.position.y = y + 12;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    var b = new Block(x,y,type);
+    b.mesh = mesh;
+    level.scene.add(b.mesh);
+      
+    return b;
   }
   
   return new Block(x,y,type);

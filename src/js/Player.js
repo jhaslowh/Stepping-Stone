@@ -63,7 +63,7 @@ Player.prototype.init = function(level){
   cube.faces.push(new THREE.Face3(2,3,1));
   
   this.mesh = new THREE.Mesh(cube, material);
-  this.mesh.position.x = level.screen_width/2; 
+  this.mesh.position.x = level.level_width/2; 
   this.mesh.position.y = level.water_level; 
   this.mesh.castShadow = true;
   this.mesh.receiveShadow = true;
