@@ -54,8 +54,9 @@ P     : Pause game
 Currently using 2 spaces for each tab, if this is a problem we an switch to 4 spaces per tab. 
 
 
-** Sounds **
+**Sounds**
 
-* Slime Splash Sound by Mike Koenig http://soundbible.com/1097-Slime-Splash.html
-
+* [Slime Splash Sound](http://soundbible.com/1097-Slime-Splash.html) by Mike Koenig
+* [Laser Cannon Sound](http://soundbible.com/1771-Laser-Cannon.html) by Mike Koenig
+* [Computer Error Sound](http://soundbible.com/172-Computer-Error.html) by Mike Koenig
 
