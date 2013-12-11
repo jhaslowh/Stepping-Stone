@@ -36,6 +36,9 @@ Does 2D screen drawing for the game.
 * Debug.js ::
 Adds some debugging features to make showing the game in class easier. 
 
+* Sound.js ::
+Controls sound for the game. 
+
 **Controls**
 
 AWSD  : Move the player
@@ -51,6 +54,8 @@ P     : Pause game
 Currently using 2 spaces for each tab, if this is a problem we an switch to 4 spaces per tab. 
 
 
+** Sounds **
 
+* Slime Splash Sound by Mike Koenig http://soundbible.com/1097-Slime-Splash.html
 
 
