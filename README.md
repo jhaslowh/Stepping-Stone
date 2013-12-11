@@ -56,6 +56,6 @@ Currently using 2 spaces for each tab, if this is a problem we an switch to 4 sp
 
 ** Sounds **
 
-* Slime Splash Sound by Mike Koenig http://soundbible.com/1097-Slime-Splash.html
+* [Slime Splash Sound](Koenig http://soundbible.com/1097-Slime-Splash.html) by Mike  
 
 
