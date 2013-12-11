@@ -163,6 +163,7 @@ Player.prototype.update = function(level){
     if (keyboard[KEY_SPACE] && this.shieldCurrentRecharge == this.shieldRecharge){
       this.shieldCurrentRecharge = 0;
       this.shieldCurrentTime = this.shieldTime;
+      shield_up_sound.play();
     }
     
     // Update shield state 
