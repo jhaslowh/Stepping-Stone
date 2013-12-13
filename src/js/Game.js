@@ -39,7 +39,7 @@ function init(){
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(WIDTH, HEIGHT);
   // Set the background color of the scene.
-  renderer.setClearColor(new THREE.Color(0xEEEEEE));
+  renderer.setClearColor(new THREE.Color(0xabf6ff));
   // Shadows (dont know what all the values do yet)
   renderer.gammaInput = true;
   renderer.gammaOutput = true;

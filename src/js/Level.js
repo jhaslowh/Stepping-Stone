@@ -19,7 +19,7 @@ function GameLevel(){
   
   // Scoring
   this.score = 0;
-  this.score_per_unit = 1;    // Score multiplier 
+  this.score_per_unit = .4;    // Score multiplier 
   
   // Rendering 
   this.camera;
