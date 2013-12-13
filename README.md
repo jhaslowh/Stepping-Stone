@@ -9,6 +9,7 @@ Stepping Stone
 In this game your objective is to not fall off the left side of the screen. This project was made for CS 425 as the final project for the class. 
 
 [Play latest version here.](http://www.divided-games.com/CS425/index.html)
+[View Highscore Data](http://www.divided-games.com/CS425/php/highscore.php)
 
 **File Descriptions**
 
