@@ -58,6 +58,7 @@ function GameLevel(){
   // States 
   this.paused = false;      
   this.gameover = false;
+  this.gameover_ran = false;
 }
 
 /** Initialize level */
@@ -162,12 +163,27 @@ GameLevel.prototype.init = function (w,h){
   this.player.init(this);
 }
 
+function game_over_run_once(score){
+  //TODO this is inelegant. Can we stop calls to gameover once the game is over?
+  if(!this.gameover_ran){
+    this.gameover_ran = true;
+    var player_name = "Default%20Name";
+    var intscore = Math.floor(score);//PHP code currently only supports ints
+    var xmlhttp =new XMLHttpRequest(); //We don't support IE6
+    var url_string = "http://www.divided-games.com/CS425/php/post_score.php?name=" + player_name + "&score=" + intscore;
+    xmlhttp.open("GET",url_string,true);
+    xmlhttp.send();
+  }
+}
+
 /** Update the state of the level */
 GameLevel.prototype.update = function(){
   // Stop game if gameover 
-  if (this.gameover)
+  if (this.gameover){
+    game_over_run_once(this.score);
     return;
-
+  }
+    
   // Update pause button 
   if (keyboard[KEY_P] && !keyboard_old[KEY_P])
     this.paused = !this.paused;
