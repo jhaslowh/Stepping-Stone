@@ -347,22 +347,36 @@ GameLevel.prototype.generateChunk = function (){
       /** Process Blocks **/
       // Set block type based off of height 
       if (block_grid[i][j] == BlockType.Auto){
-        if (this.clearAbove(block_grid, i, j) && Math.random() < this.percent_for_timedrop)
-          block_grid[i][j] = BlockType.Time;
-        else if (j > (this.grid_water_level-1) + 3)
-          block_grid[i][j] = BlockType.UnderWRock;
-        else if (j >= this.grid_water_level - 1)
-          block_grid[i][j] = BlockType.Sand;
-        else if (block_grid[i][j-1] == BlockType.NoBlock ||
-              block_grid[i][j-1] == BlockType.Path || j-1 < 0){
-          block_grid[i][j] = BlockType.DirtGrass;
-          
-          // Make more dirt to make it more dynamic 
-          if (block_grid[i][j+1] == BlockType.Auto && Math.random() < .31)
-            block_grid[i][j+1] = BlockType.Dirt;
+        // Try to generate a powerup 
+        var block_filed = false;
+        if (Math.random() < this.percent_for_timedrop){
+          if (this.clearAroundTop(block_grid, i, j)){
+            block_grid[i][j] = BlockType.Time;
+            block_filed = true;
+          }
+          else if (this.topIsPlain(block_grid, i, j)){
+            block_grid[i][j-1] = BlockType.Time;
+          }
         }
-        else
-          block_grid[i][j] = BlockType.Rock;
+        
+        // If no powerup created 
+        if (!block_filed){
+          if (j > (this.grid_water_level-1) + 3)
+            block_grid[i][j] = BlockType.UnderWRock;
+          else if (j >= this.grid_water_level - 1)
+            block_grid[i][j] = BlockType.Sand;
+          else if (j-1 < 0 || block_grid[i][j-1] == BlockType.NoBlock ||
+                block_grid[i][j-1] == BlockType.Path || 
+                block_grid[i][j-1] == BlockType.Time){
+            block_grid[i][j] = BlockType.DirtGrass;
+            
+            // Make more dirt to make it more dynamic 
+            if (block_grid[i][j+1] == BlockType.Auto && Math.random() < .31)
+              block_grid[i][j+1] = BlockType.Dirt;
+          }
+          else
+            block_grid[i][j] = BlockType.Rock;
+        }
       }
       
       // Turn off path if it is set off 
@@ -473,8 +487,16 @@ GameLevel.prototype.resetOverflowGrid = function(){
   }
 }
 
+/** Check if Just the top a flat plain **/
+GameLevel.prototype.topIsPlain = function(grid, i, j){
+  if (this.isEmptySpace(grid, i-1,j-1) && this.isEmptySpace(grid, i,j-1) && this.isEmptySpace(grid, i+1,j-1) 
+    && this.isFilledSpace(grid, i+1,j) && this.isFilledSpace(grid, i-1,j)) 
+    return true;
+  return false;
+}
+
 /** Check if the blocks above a block are clear **/
-GameLevel.prototype.clearAbove = function(grid, i, j){
+GameLevel.prototype.clearAroundTop = function(grid, i, j){
   if (this.isEmptySpace(grid, i-1,j) && this.isEmptySpace(grid, i-1,j-1) 
     && this.isEmptySpace(grid, i,j-1) && this.isEmptySpace(grid, i+1,j-1) 
     && this.isEmptySpace(grid, i+1,j)) 
@@ -489,6 +511,17 @@ GameLevel.prototype.isEmptySpace = function(grid, i, j){
   }
   if (grid[i][j] == BlockType.NoBlock ||
     grid[i][j] == BlockType.Path){
+    return true;
+  }
+  return false;
+}
+
+/** Return true if spot in grid is an filled space **/
+GameLevel.prototype.isFilledSpace = function(grid, i, j){
+  if (j < 0 || i >= this.hor_blocks || i < 0){
+    return true;
+  }
+  if (grid[i][j] == BlockType.Auto){
     return true;
   }
   return false;

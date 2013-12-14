@@ -213,7 +213,10 @@ function generateBlock(type, x, y, chunk){
     return b;
   }
   
-  return new Block(x,y,type);
+  var b = new Block(x,y,type);
+  b.active = false;
+  b.collides = false;
+  return b;
 }
 
 
