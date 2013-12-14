@@ -307,9 +307,15 @@ Player.prototype.hitCeiling = function(){
 Player.prototype.hitWater = function(){
   // Play splash sound 
   if (PLAY_SOUNDS){
-    splash_sound.volume = this.air_t; // Volume depends on how long the player falls. Volume maxes when air_t is =>1
-    splash_sound.currentTime = 0;
-    splash_sound.play();
+    soundTest();
+
+
+    console.log(this.mesh.position.x);
+//    console.log("level": + level.level_left());
+
+ //   splash_sound.volume = this.air_t; // Volume depends on how long the player falls. Volume maxes when air_t is =>1
+//    splash_sound.currentTime = 0;
+//    splash_sound.play();
   }
   this.hitGround();
 }

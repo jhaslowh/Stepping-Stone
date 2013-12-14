@@ -30,6 +30,29 @@ function loadResources()
   document.body.appendChild(shield_cooldown_sound);
   shield_cooldown_sound.setAttribute("src","res/shield_cooldown_sound.mp3");
 
+
+
 }
+
+
+function soundTest(){
+    splash_sound.volume = this.air_t; // Volume depends on how long the player falls. Volume maxes when air_t is =>1
+    splash_sound.currentTime = 0;
+//    splash_sound.play();
+
+
+    var second_sound = splash_sound;
+   // second_sound.play();
+    //console.log("test");
+    //console.log(player);
+//    console.log(level.level_left);
+
+//    level.level_left 
+  //  player.mesh.position.y. 
+
+
+}
+
+
 
 loadResources();
