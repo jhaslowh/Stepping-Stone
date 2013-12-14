@@ -30,8 +30,6 @@ function loadResources()
   document.body.appendChild(shield_cooldown_sound);
   shield_cooldown_sound.setAttribute("src","res/shield_cooldown_sound.mp3");
 
-  shield_cooldown_sound
-
 }
 
 loadResources();
