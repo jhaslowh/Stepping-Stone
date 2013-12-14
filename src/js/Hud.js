@@ -29,7 +29,7 @@ function Hud(){
 
   /** Level Score **/
   this.levelScoreLoc = {x: 0, y: 0};
-  this.levelScoreSize = 30;
+  this.levelScoreSize = 25;
 }
 
 /** Update hud state **/
@@ -112,28 +112,32 @@ Hud.prototype.draw = function(renderer){
 var textScenes = [];
 // Length of each text 
 var textLengths = [];
+// Origins of text
+var textOrigins = [];
 // Standard text scale
 var textScale = 100;
 
 /** Draw text to the screen **/
 Hud.prototype.drawText = function(x, y, size, text){
-  // Current text offset 
-  var offset = 0;
+  // Scale to draw text at 
   var scale = size/textScale;
+  // Current text offset 
+  var offsetx = textOrigins[intFromChar(text.charAt(i))].x * scale;
+  var offsety = -textOrigins[intFromChar(text.charAt(i))].y * scale;
 
   // Draw text to screen
   for (var i = 0; i < text.length; i++){
     // Get number 
     var index = intFromChar(text.charAt(i));
     // Set position
-    textScenes[index].children[0].position.set(x + offset, y, 0);
+    textScenes[index].children[0].position.set(x + offsetx, y + offsety, 0);
     // Set size
     textScenes[index].children[0].scale.set(
       textScenes[index].children[0].scale.x * scale, 
       textScenes[index].children[0].scale.y * scale,
       textScenes[index].children[0].scale.z * scale);
     // Set offset for next number 
-    offset += textLengths[index] * (size/textScale);
+    offsetx += textLengths[index] * (size/textScale);
     // Draw number 
     renderer.render(textScenes[index], this.camera);
     // Fix size
@@ -269,6 +273,18 @@ Hud.prototype.initText = function(){
   textLengths[7] = 75;
   textLengths[8] = 80;
   textLengths[9] = 80;
+
+  // Set origins 
+  textOrigins[0] = {x:38, y:51};
+  textOrigins[1] = {x:23, y:50};
+  textOrigins[2] = {x:36, y:50};
+  textOrigins[3] = {x:35, y:51};
+  textOrigins[4] = {x:39, y:50};
+  textOrigins[5] = {x:38, y:50};
+  textOrigins[6] = {x:38, y:51};
+  textOrigins[7] = {x:38, y:50};
+  textOrigins[8] = {x:38, y:51};
+  textOrigins[9] = {x:38, y:51};
 
   // Make text scenes
   // Number 0

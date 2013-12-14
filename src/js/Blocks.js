@@ -221,7 +221,7 @@ function generateBlock(type, x, y, chunk){
 
 
 /** =================================== **/
-/**       Pathfinding                   **/
+/**       A* Pathfinding                **/
 /** =================================== **/
 
 var MOVE_COST = 1;
