@@ -11,15 +11,17 @@ var mouse = {
   down_y:0};
 
 // Game variables 
-var gameState = "playing";
 var level = new GameLevel();
-var time_step = .016;
-var WIDTH = 0, HEIGHT = 0;
 var hud = new Hud();
 var debug = new Debug();
-
-// Three.js variables 
 var renderer;
+
+// Game Settings 
+var PLAY_SOUNDS = true;
+var FPS = 60; // Can only be changed at start of game 
+var time_step = (1000/FPS)/1000;
+var DRAW_PATHFINDING = true;
+var WIDTH = 0, HEIGHT = 0;
 
 // Beginning initialization 
 function init(){
@@ -27,7 +29,6 @@ function init(){
   
   // Window size 
   WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
-  //var WIDTH = 800, HEIGHT = 600;
         
   // Set up level 
   level.init(WIDTH,HEIGHT);
@@ -57,7 +58,7 @@ function init(){
   document.body.appendChild( stats.domElement );
   setInterval( function () {
     stats.update();
-  }, 1000 / 60 );*/
+  }, 1000 / FPS );*/
 }
 
 // Main Game loop 
@@ -81,21 +82,10 @@ function gameLoop()
   hud.draw(renderer);
 }
 
-// Play a sound file 
-function playSound(file) 
-{
-  //var sound = document.createElement("audio");
-  //sound.setAttribute("src", "sounds/" + file + ".mp3");
-  //sound.play();
-}
-
-//-----------------------------------------------------------------------------
-//start the Game here
-//-----------------------------------------------------------------------------
-
+// Setup game 
 init();
 
 //enter game loop
-setInterval(gameLoop, 1000 / 100);
+setInterval(gameLoop, 1000 / FPS);
 
 

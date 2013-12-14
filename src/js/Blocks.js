@@ -221,8 +221,6 @@ function generateBlock(type, x, y, chunk){
 /**       Pathfinding                   **/
 /** =================================== **/
 
-var DRAW_PATHFINDING = true;
-// 
 var MOVE_COST = 1;
 var MOVE_COST_DIAG = 2;
 

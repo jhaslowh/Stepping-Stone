@@ -1,5 +1,5 @@
-var GRAVITY = 980;
-var SINK_SPEED = 10;
+var GRAVITY = 1400;
+var SINK_SPEED = 40;
 
 /** Player Structure */
 function Player(){ 
@@ -8,7 +8,7 @@ function Player(){
   this.ny = 0;
   this.w = 48;
   this.h = 24;
-  this.speed = 5;
+  this.speed = 450;
   this.mesh;
   
   // Shield
@@ -94,9 +94,9 @@ Player.prototype.update = function(level){
       
       // Update controls 
       if (keyboard[KEY_D])
-        this.nx += this.speed;
+        this.nx += this.speed * time_step;
       if (keyboard[KEY_A])
-        this.nx -= this.speed;
+        this.nx -= this.speed * time_step;
       if (keyboard[KEY_W]){
         // See if player can jump 
         if (!this.jumping && !this.inAir){
@@ -135,13 +135,13 @@ Player.prototype.update = function(level){
       
       // Update controls 
       if (keyboard[KEY_D])
-        this.nx += this.speed;
+        this.nx += this.speed * time_step;
       if (keyboard[KEY_A])
-        this.nx -= this.speed;
+        this.nx -= this.speed * time_step;
       if (keyboard[KEY_S])
-        this.ny += this.speed;
+        this.ny += this.speed * time_step;
       if (keyboard[KEY_W])
-        this.ny -= this.speed;
+        this.ny -= this.speed * time_step;
         
       // Water gravity 
       this.ny += SINK_SPEED * time_step;
@@ -305,10 +305,12 @@ Player.prototype.hitCeiling = function(){
 
 /** Called when player hits the surface of water **/
 Player.prototype.hitWater = function(){
- // splash_sound.volume = this.air_t;
-  splash_sound.volume = this.air_t;//Volume depends on how long the player falls. Volume maxes when air_t is =>1
-  splash_sound.currentTime = 0;
-  splash_sound.play();
+  // Play splash sound 
+  if (PLAY_SOUNDS){
+    splash_sound.volume = this.air_t; // Volume depends on how long the player falls. Volume maxes when air_t is =>1
+    splash_sound.currentTime = 0;
+    splash_sound.play();
+  }
   this.hitGround();
 }
 

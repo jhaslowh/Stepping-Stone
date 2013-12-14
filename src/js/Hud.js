@@ -23,6 +23,10 @@ function Hud(){
   this.shieldBar;
   this.shieldOutline;
 
+  /** Sounds **/
+  this.soundOnSprite;
+  this.soundOffSprite;
+
   /** Level Score **/
   this.levelScoreLoc = {x: 0, y: 0};
   this.levelScoreSize = 30;
@@ -71,6 +75,20 @@ Hud.prototype.update = function(){
     
   // Update shield state 
 	this.shieldBar.scale.set( (level.player.shieldCurrentRecharge / level.player.shieldRecharge) * 100, 20, 1.0 );
+
+
+  // Update Sound buttons 
+  // Check if clicked
+  if (mouse.x >= 0 && mouse.x <= 52 && mouse.y >= 0 && mouse.y <= 52 
+    && mouse.left_down && !mouse.left_down_old) PLAY_SOUNDS = !PLAY_SOUNDS;
+  // Set displays 
+  if (PLAY_SOUNDS){
+    this.soundOnSprite.material.opacity = 1;
+    this.soundOffSprite.material.opacity = 0;
+  }else{
+    this.soundOnSprite.material.opacity = 0;
+    this.soundOffSprite.material.opacity = 1;
+  }
 }
 
 /** Draw hud **/
@@ -78,10 +96,12 @@ Hud.prototype.draw = function(renderer){
   renderer.render(this.scene, this.camera);
 
   // Draw level score to screen 
+  var s = ""+Math.round(level.score);
+  var len = this.measureNumString(s,this.levelScoreSize);
   this.drawText(
-    this.levelScoreLoc.x,
+    this.levelScoreLoc.x-(len/2),
     this.levelScoreLoc.y,
-    this.levelScoreSize,""+Math.round(level.score));
+    this.levelScoreSize,s);
 }
 
 /*==========================================*/
@@ -93,7 +113,7 @@ var textScenes = [];
 // Length of each text 
 var textLengths = [];
 // Standard text scale
-var textScale = 200;
+var textScale = 100;
 
 /** Draw text to the screen **/
 Hud.prototype.drawText = function(x, y, size, text){
@@ -126,14 +146,14 @@ Hud.prototype.drawText = function(x, y, size, text){
 
 /** Measure a number string.
  * Usefull when automatically positioning text **/
-Hud.prototype.measureNumString = function(s){
+Hud.prototype.measureNumString = function(s,size){
   // Current length 
   var len = 0;
   
   for (var i = 0; i < s.length; i++)
     len += textLengths[s.charAt(i)];
   
-  return len;
+  return len * (size/textScale);
 }
 
 /** Get the interger for the corrosponding character **/
@@ -150,8 +170,6 @@ function intFromChar(c){
   else if (c == '9') return 9;
   else return 0;
 }
-
-
 
 /*==========================================*/
 /**           Init Code                     */
@@ -219,29 +237,45 @@ Hud.prototype.init = function(w, h){
   this.shieldOutline.scale.set( 120, 40, 1.0 );
   this.scene.add( this.shieldOutline  );
 
+  texture = THREE.ImageUtils.loadTexture( 'res/sound_on.png' );
+  material = new THREE.SpriteMaterial( { map: texture } );
+  material.transparent = true;
+  this.soundOnSprite  = new THREE.Sprite( material );
+  this.soundOnSprite.position.set( 26,26, 0 );
+  this.soundOnSprite.scale.set( 52,52, 1.0 );
+  this.scene.add( this.soundOnSprite  );
+
+  texture = THREE.ImageUtils.loadTexture( 'res/sound_off.png' );
+  material = new THREE.SpriteMaterial( { map: texture } );
+  material.transparent = true;
+  this.soundOffSprite  = new THREE.Sprite( material );
+  this.soundOffSprite.position.set( 26,26, 0 );
+  this.soundOffSprite.scale.set( 52,52, 1.0 );
+  this.scene.add( this.soundOffSprite  );
+
   this.initText();
 }
 
 /** initialize the text **/
 Hud.prototype.initText = function(){
   // Setup text sizes 
-  textLengths[0] = 140;
-  textLengths[1] = 134;
-  textLengths[2] = 150;
-  textLengths[3] = 160;
-  textLengths[4] = 158;
-  textLengths[5] = 150;
-  textLengths[6] = 154;
-  textLengths[7] = 150;
-  textLengths[8] = 160;
-  textLengths[9] = 160;
+  textLengths[0] = 70;
+  textLengths[1] = 67;
+  textLengths[2] = 75;
+  textLengths[3] = 80;
+  textLengths[4] = 79;
+  textLengths[5] = 75;
+  textLengths[6] = 77;
+  textLengths[7] = 75;
+  textLengths[8] = 80;
+  textLengths[9] = 80;
 
   // Make text scenes
   // Number 0
   var texture = THREE.ImageUtils.loadTexture( 'res/nums/num0.png' );
   var material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   var sprite = new THREE.Sprite( material );
-  sprite.scale.set( 152,206, 1.0 );
+  sprite.scale.set( 76,103, 1.0 );
   textScenes[0] = new THREE.Scene();
   textScenes[0].add(sprite);
 
@@ -249,63 +283,63 @@ Hud.prototype.initText = function(){
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num1.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 94,200, 1.0 );
+  sprite.scale.set( 47,100, 1.0 );
   textScenes[1] = new THREE.Scene();
   textScenes[1].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num2.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 144,203, 1.0 );
+  sprite.scale.set( 72,101, 1.0 );
   textScenes[2] = new THREE.Scene();
   textScenes[2].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num3.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 143,206, 1.0 );
+  sprite.scale.set( 71,102, 1.0 );
   textScenes[3] = new THREE.Scene();
   textScenes[3].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num4.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 158,203, 1.0 );
+  sprite.scale.set( 79,101, 1.0 );
   textScenes[4] = new THREE.Scene();
   textScenes[4].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num5.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 143,203, 1.0 );
+  sprite.scale.set( 76,101, 1.0 );
   textScenes[5] = new THREE.Scene();
   textScenes[5].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num6.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 154,206, 1.0 );
+  sprite.scale.set( 77,103, 1.0 );
   textScenes[6] = new THREE.Scene();
   textScenes[6].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num7.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 143,200, 1.0 );
+  sprite.scale.set( 76,100, 1.0 );
   textScenes[7] = new THREE.Scene();
   textScenes[7].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num8.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 152,206, 1.0 );
+  sprite.scale.set( 76,103, 1.0 );
   textScenes[8] = new THREE.Scene();
   textScenes[8].add(sprite);
 
   texture = THREE.ImageUtils.loadTexture( 'res/nums/num9.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   sprite = new THREE.Sprite( material );
-  sprite.scale.set( 152,206, 1.0 );
+  sprite.scale.set( 76,103, 1.0 );
   textScenes[9] = new THREE.Scene();
   textScenes[9].add(sprite);
 }
