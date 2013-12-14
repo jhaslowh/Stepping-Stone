@@ -167,7 +167,10 @@ function game_over_run_once(score){
   //TODO this is inelegant. Can we stop calls to gameover once the game is over?
   if(!this.gameover_ran){
     this.gameover_ran = true;
-    var player_name = "Default%20Name";
+    var player_name = prompt("Player Name:","Default Name");
+    if(player_name==null){
+      player_name = "null";
+    }
     var intscore = Math.floor(score);//PHP code currently only supports ints
     var xmlhttp =new XMLHttpRequest(); //We don't support IE6
     var url_string = "http://www.divided-games.com/CS425/php/post_score.php?name=" + player_name + "&score=" + intscore;
