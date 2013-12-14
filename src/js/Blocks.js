@@ -43,6 +43,9 @@ Block.prototype.collide = function(){
   }
 }
 
+/** Call to do any block drawing **/
+Block.prototype.draw = function(){}
+
 /** ================================================= **/
 /** ======== Block Generation ======================= **/
 /** ================================================= **/
@@ -249,6 +252,7 @@ function DeathBlock(x,y,type){
   // Debug 
   this.debug_line = -1;
   this.debug_target = -1;
+  this.debug_cubes = new THREE.Scene();
 }
 
 // Update death block 
@@ -284,6 +288,11 @@ DeathBlock.prototype.collide = function(){
   }
 }
 
+/** Call to do any death block drawing */
+DeathBlock.prototype.draw = function(){
+  renderer.render(this.debug_cubes, level.camera);
+}
+
 // Pathfinding for death block 
 // Uses: http://www.policyalmanac.org/games/aStarTutorial.htm
 DeathBlock.prototype.findPath = function(){
@@ -298,7 +307,7 @@ DeathBlock.prototype.findPath = function(){
   open.push(current);
 
   // Search grid for correct path 
-  while (current.loc.x != this.goalLoc.x && current.loc.y != this.goalLoc.y){
+  while ((current.loc.x == this.goalLoc.x && current.loc.y == this.goalLoc.y) == false){
     // Take current out of open list and add it to closed
     var index = open.indexOf(current);
     if (index >= 0) open.splice(index, 1);
@@ -336,6 +345,24 @@ DeathBlock.prototype.findPath = function(){
     this.debug_target.position.x = this.goalLoc.x;
     this.debug_target.position.y = this.goalLoc.y;
     level.scene.add(this.debug_target);
+
+    // Make cubes 
+    var cube = new THREE.CubeGeometry( 10,10,10); 
+    var material = new THREE.MeshBasicMaterial( { color: 0xff00e4} );
+    var material2 = new THREE.MeshBasicMaterial( { color: 0x000000} );
+    for (var i = 0; i < closed.length; i++){
+      var mesh = new THREE.Mesh(cube, material2);
+      mesh.position.x = closed[i].loc.x;
+      mesh.position.y = closed[i].loc.y;
+      this.debug_cubes.add(mesh);
+    }
+    for (var i = 0; i < open.length; i++){
+      var mesh = new THREE.Mesh(cube, material);
+      mesh.position.x = open[i].loc.x;
+      mesh.position.y = open[i].loc.y;
+      this.debug_cubes.add(mesh);
+    }
+
   }
 
   // Get rid of grid 
@@ -374,16 +401,20 @@ DeathBlock.prototype.addLegal = function(i,j,open,closed,parent){
   // Check Top Left 
   if (i-1 >= 0 && j-1 >= 0 && (this.blockGrid[i-1][j-1] == BlockType.NoBlock ||
     this.blockGrid[i-1][j-1] == BlockType.Path)){
-    // Make node
-    var node = new Node(
-      this.gridStartX + ((i-1) * 25) + 12.5, 
-      level.gen_top + ((j-1) * 25) + 12.5, 
-      parent.G + MOVE_COST_DIAG, i-1, j-1);
-    node.parent = parent;
-    node.setHeuristic(this.goalLoc);
+    // Make sure it cant cut a corner 
+    if (this.blockGrid[i-1][j] == BlockType.NoBlock || 
+        this.blockGrid[i-1][j] == BlockType.Path){
+      // Make node
+      var node = new Node(
+        this.gridStartX + ((i-1) * 25) + 12.5, 
+        level.gen_top + ((j-1) * 25) + 12.5, 
+        parent.G + MOVE_COST_DIAG, i-1, j-1);
+      node.parent = parent;
+      node.setHeuristic(this.goalLoc);
 
-    // Add to open list
-    this.addToOpenList(node,open,closed);
+      // Add to open list
+      this.addToOpenList(node,open,closed);
+    }
   }
 
   // Check top
@@ -405,16 +436,20 @@ DeathBlock.prototype.addLegal = function(i,j,open,closed,parent){
   if (i+1 < this.blockGrid.length && j-1 >= 0 && 
     (this.blockGrid[i+1][j-1] == BlockType.NoBlock ||
     this.blockGrid[i+1][j-1] == BlockType.Path)){
-    // Make node
-    var node = new Node(
-      this.gridStartX + ((i+1) * 25) + 12.5, 
-      level.gen_top + ((j-1) * 25) + 12.5, 
-      parent.G + MOVE_COST_DIAG,i+1,j-1);
-    node.parent = parent;
-    node.setHeuristic(this.goalLoc);
+    // Make sure it cant cut a corner 
+    if (this.blockGrid[i+1][j] == BlockType.NoBlock || 
+        this.blockGrid[i+1][j] == BlockType.Path){
+      // Make node
+      var node = new Node(
+        this.gridStartX + ((i+1) * 25) + 12.5, 
+        level.gen_top + ((j-1) * 25) + 12.5, 
+        parent.G + MOVE_COST_DIAG,i+1,j-1);
+      node.parent = parent;
+      node.setHeuristic(this.goalLoc);
 
-    // Add to open list
-    this.addToOpenList(node,open,closed);
+      // Add to open list
+      this.addToOpenList(node,open,closed);
+    }
   }
 
   // Check right
@@ -436,16 +471,20 @@ DeathBlock.prototype.addLegal = function(i,j,open,closed,parent){
   if (j+1 < this.blockGrid[i].length && i+1 < this.blockGrid.length && 
     (this.blockGrid[i+1][j+1] == BlockType.NoBlock ||
     this.blockGrid[i+1][j+1] == BlockType.Path)){
-    // Make node
-    var node = new Node(
-      this.gridStartX + ((i+1) * 25) + 12.5, 
-      level.gen_top + ((j+1) * 25) + 12.5, 
-      parent.G + MOVE_COST_DIAG,i+1,j+1);
-    node.parent = parent;
-    node.setHeuristic(this.goalLoc);
+    // Make sure it cant cut a corner 
+    if (this.blockGrid[i+1][j] == BlockType.NoBlock || 
+        this.blockGrid[i+1][j] == BlockType.Path){
+      // Make node
+      var node = new Node(
+        this.gridStartX + ((i+1) * 25) + 12.5, 
+        level.gen_top + ((j+1) * 25) + 12.5, 
+        parent.G + MOVE_COST_DIAG,i+1,j+1);
+      node.parent = parent;
+      node.setHeuristic(this.goalLoc);
 
-    // Add to open list
-    this.addToOpenList(node,open,closed);
+      // Add to open list
+      this.addToOpenList(node,open,closed);
+    }
   }
 
   // Check bottom
@@ -467,16 +506,20 @@ DeathBlock.prototype.addLegal = function(i,j,open,closed,parent){
   if (j+1 < this.blockGrid[i].length && i-1 >= 0 && 
     (this.blockGrid[i-1][j+1] == BlockType.NoBlock ||
     this.blockGrid[i-1][j+1] == BlockType.Path)){
-    // Make node
-    var node = new Node(
-      this.gridStartX + ((i-1) * 25) + 12.5, 
-      level.gen_top + ((j+1) * 25) + 12.5, 
-      parent.G + MOVE_COST_DIAG,i-1,j+1);
-    node.parent = parent;
-    node.setHeuristic(this.goalLoc);
+    // Make sure it cant cut a corner 
+    if (this.blockGrid[i-1][j] == BlockType.NoBlock || 
+        this.blockGrid[i-1][j] == BlockType.Path){
+      // Make node
+      var node = new Node(
+        this.gridStartX + ((i-1) * 25) + 12.5, 
+        level.gen_top + ((j+1) * 25) + 12.5, 
+        parent.G + MOVE_COST_DIAG,i-1,j+1);
+      node.parent = parent;
+      node.setHeuristic(this.goalLoc);
 
-    // Add to open list
-    this.addToOpenList(node,open,closed);
+      // Add to open list
+      this.addToOpenList(node,open,closed);
+    }
   }
 }
 
@@ -486,8 +529,8 @@ DeathBlock.prototype.addToOpenList = function(node, open,closed){
   for (var i = 0; i < open.length; i++){
     if (open[i].loc.x == node.loc.x && open[i].loc.y == node.loc.y)
     {
-      // TODO Might be wrong 
-      if (node.G > open[i].G){
+      // Might be wrong 
+      if (node.G < open[i].G){
         open[i].G = node.G;
         open[i].parent = node.parent;
       }

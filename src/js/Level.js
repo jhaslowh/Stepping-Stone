@@ -244,6 +244,10 @@ GameLevel.prototype.draw = function (renderer){
   
   this.camera.position.set( cam_loc.x, cam_loc.y, cam_loc.z );
   this.camera.lookAt(new THREE.Vector3(this.level_loc.x,this.level_loc.y,0));
+
+  // Draw blocks 
+  for (var i = 0; i < this.blocks.length; i++)
+    if (this.blocks[i].active) this.blocks[i].draw();
   
   // Draw scene 
   renderer.render( this.scene, this.camera );
