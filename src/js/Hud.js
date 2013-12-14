@@ -182,7 +182,7 @@ Hud.prototype.init = function(w, h){
   this.scene = new THREE.Scene();
 
   // Set level score location 
-  this.levelScoreLoc = {x: w/2, y: h - 70};
+  this.levelScoreLoc = {x: w/2, y: h - 40};
   
   /** Set up tut **/
   var texture = THREE.ImageUtils.loadTexture( 'res/tut.png' );
