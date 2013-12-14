@@ -22,8 +22,6 @@ function Player(){
   // Time until shield can be used again
   this.shieldRecharge = 10;      
   
-  this.mouse_min_move = 25;
-  
   // Physics 
   this.jumpt = 0;
   this.yo = 0;
@@ -95,11 +93,11 @@ Player.prototype.update = function(level){
       this.in_water = false;
       
       // Update controls 
-      if (keyboard[KEY_D] || (mouse.left_down && mouse.x > mouse.down_x + this.mouse_min_move))
+      if (keyboard[KEY_D])
         this.nx += this.speed;
-      if (keyboard[KEY_A] || (mouse.left_down && mouse.x < mouse.down_x - this.mouse_min_move))
+      if (keyboard[KEY_A])
         this.nx -= this.speed;
-      if (keyboard[KEY_W] || (mouse.left_down && mouse.y < mouse.down_y + this.mouse_min_move)){
+      if (keyboard[KEY_W]){
         // See if player can jump 
         if (!this.jumping && !this.inAir){
           // Set up physics 
@@ -136,13 +134,13 @@ Player.prototype.update = function(level){
       this.in_water = true;
       
       // Update controls 
-      if (keyboard[KEY_D] || (mouse.left_down && mouse.x > mouse.down_x + this.mouse_min_move))
+      if (keyboard[KEY_D])
         this.nx += this.speed;
-      if (keyboard[KEY_A] || (mouse.left_down && mouse.x < mouse.down_x - this.mouse_min_move))
+      if (keyboard[KEY_A])
         this.nx -= this.speed;
-      if (keyboard[KEY_S] || (mouse.left_down && mouse.y > mouse.down_y + this.mouse_min_move))
+      if (keyboard[KEY_S])
         this.ny += this.speed;
-      if (keyboard[KEY_W] || (mouse.left_down && mouse.y < mouse.down_y - this.mouse_min_move))
+      if (keyboard[KEY_W])
         this.ny -= this.speed;
         
       // Water gravity 
