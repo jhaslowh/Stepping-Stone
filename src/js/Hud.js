@@ -133,6 +133,18 @@ Hud.prototype.drawText = function(x, y, size, text){
   }
 }
 
+/** Measure a number string.
+ * Usefull when automatically positioning text **/
+Hud.prototype.measureNumString = function(s){
+  // Current length 
+  var len = 0;
+  
+  for (var i = 0; i < s.length; i++)
+    len += textLengths[s.charAt(i)];
+  
+  return len;
+}
+
 /** Get the interger for the corrosponding character **/
 function intFromChar(c){
   if (c == '0') return 0;
@@ -147,6 +159,8 @@ function intFromChar(c){
   else if (c == '9') return 9;
   else return 0;
 }
+
+
 
 /*==========================================*/
 /**           Init Code                     */
