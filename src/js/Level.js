@@ -26,7 +26,7 @@ function GameLevel(){
   this.camera_move_speed = 1; // The camera will move to the right, player must keep up
   this.camera_speed_max = 3;  // Max allowed camera speed 
   this.camera_accel = .005;    // Camera acceleration per second 
-  this.camera_loc = {x:0,y:0};// Current camera location. Controled by level
+  this.level_loc = {x:0,y:0};// Current camera location. Controled by level
   this.camera_zoom;           // Zoom for camera, auto calculated in init()
   this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
   this.camera_max_tilt = 35;  // This is tilt down
@@ -51,7 +51,7 @@ function GameLevel(){
   this.block_overflow_grid;   // Overflow grid so that we dont get strait lines on chunk seems
   this.level_width = 0;
   this.level_height = 1000;
-  this.gen_chunk_width = 2500; // Width of a chunk 
+  this.gen_chunk_width = 2000; // Width of a chunk 
   this.pattern_types = 8; // Total number of patterns
   this.percent_for_timedrop = .1; // Percentage change to drop a time box 
   
@@ -68,8 +68,8 @@ GameLevel.prototype.init = function (w,h){
   
   /** Set up rendering Code */
   // Move camera to middle of level width and height 
-  this.camera_loc.x = this.level_width /2;
-  this.camera_loc.y = this.level_height /2;
+  this.level_loc.x = this.level_width /2;
+  this.level_loc.y = this.level_height /2;
   /* Set the camera z based on the screen width, 
    * so the whole level can be seen. */
   this.camera_zoom = -((this.level_height/2) / Math.tan((Math.PI * 22.5)/180)); 
@@ -91,7 +91,7 @@ GameLevel.prototype.init = function (w,h){
   this.scene = new THREE.Scene();
   
   /** Set up generation code */
-  this.next_gen_loc = this.camera_loc.x + (this.level_width / 2);
+  this.next_gen_loc = this.level_loc.x + (this.level_width / 2);
   // Get the number of blocks that fit on the screen vertically divided by 2
   this.vert_blocks = Math.round((this.level_height / 25)) - 4;
   this.hor_blocks = Math.round((this.gen_chunk_width/ 25));
@@ -127,11 +127,11 @@ GameLevel.prototype.init = function (w,h){
   c = new THREE.CubeGeometry(this.water_size, 160, 160); // Don't change the width and depth here, the bump map is based off of them 
   this.sea_floor = new THREE.Mesh(c, material);
   this.sea_floor.receiveShadow = true;
-  this.sea_floor.position.x = this.camera_loc.x;
+  this.sea_floor.position.x = this.level_loc.x;
   this.sea_floor.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
   this.sea_floor2 = new THREE.Mesh(c, material);
   this.sea_floor2.receiveShadow = true;
-  this.sea_floor2.position.x = this.camera_loc.x + this.water_size;
+  this.sea_floor2.position.x = this.level_loc.x + this.water_size;
   this.sea_floor2.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
   this.scene.add(this.sea_floor);
   this.scene.add(this.sea_floor2);
@@ -205,7 +205,7 @@ GameLevel.prototype.update = function(){
     this.camera_move_speed += this.camera_accel * time_step;
     if (this.camera_move_speed > this.camera_speed_max)
       this.camera_move_speed = this.camera_speed_max;
-    this.camera_loc.x += this.camera_move_speed;
+    this.level_loc.x += this.camera_move_speed;
     this.fix_water_loc();
     this.fix_light_loc();
     
@@ -219,7 +219,7 @@ GameLevel.prototype.update = function(){
       this.blocks[i].update(this);
       
     // Block generation 
-    if (this.camera_loc.x + this.level_width > this.next_gen_loc)
+    if (this.level_loc.x + this.level_width > this.next_gen_loc)
       this.generateChunk();
   }
 }
@@ -236,11 +236,11 @@ GameLevel.prototype.draw = function (renderer){
   // Apply matrix to location 
   cam_loc.applyProjection(matrix);
   // Move location to correct x and y values 
-  cam_loc.x += this.camera_loc.x;
-  cam_loc.y += this.camera_loc.y;
+  cam_loc.x += this.level_loc.x;
+  cam_loc.y += this.level_loc.y;
   
   this.camera.position.set( cam_loc.x, cam_loc.y, cam_loc.z );
-  this.camera.lookAt(new THREE.Vector3(this.camera_loc.x,this.camera_loc.y,0));
+  this.camera.lookAt(new THREE.Vector3(this.level_loc.x,this.level_loc.y,0));
   
   // Draw scene 
   renderer.render( this.scene, this.camera );
@@ -253,28 +253,28 @@ GameLevel.prototype.fix_water_level = function (){
 
 /** Set the water location based on camera location */
 GameLevel.prototype.fix_water_loc = function(){
-  this.water_cube.position.x = this.camera_loc.x;
-  if (this.sea_floor.position.x < this.camera_loc.x - this.water_size)
+  this.water_cube.position.x = this.level_loc.x;
+  if (this.sea_floor.position.x < this.level_loc.x - this.water_size)
     this.sea_floor.position.x = this.sea_floor2.position.x + this.water_size;
-  if (this.sea_floor2.position.x < this.camera_loc.x - this.water_size)
+  if (this.sea_floor2.position.x < this.level_loc.x - this.water_size)
     this.sea_floor2.position.x = this.sea_floor.position.x + this.water_size;
 }
 
 /** Fix the light location based off of the camera */
 GameLevel.prototype.fix_light_loc = function(){
-  this.hem_light.position.set( this.camera_loc.x, -500, 0 );
-  this.direct_light.position.set( this.camera_loc.x, -400, -200 );
-  this.direct_light.target.position.set( this.camera_loc.x, 0, 0 );
+  this.hem_light.position.set( this.level_loc.x, -500, 0 );
+  this.direct_light.position.set( this.level_loc.x, -400, -200 );
+  this.direct_light.target.position.set( this.level_loc.x, 0, 0 );
 }
 
 /** Get the x value of the left side of the level */
 GameLevel.prototype.level_left = function(){
-  return this.camera_loc.x - (this.level_width/2);
+  return this.level_loc.x - (this.level_width/2);
 }
 
 /** Get the x value of the right side of the level */
 GameLevel.prototype.level_right = function(){
-  return this.camera_loc.x + (this.level_width/2);
+  return this.level_loc.x + (this.level_width/2);
 }
 
 /** Get the y value of the bottom of the level */
@@ -318,6 +318,18 @@ GameLevel.prototype.generateChunk = function (){
   /** =========================== **/
   this.makeCorrectPath(block_grid, this.last_path_block, 0);
   this.makeCorrectPath(block_grid, this.last_path_block2, 1);
+
+  /** =========================== **/ 
+  /** Make a death block          **/
+  /** =========================== **/
+  var index = this.nextBlockIndex();
+  var block = getDeathBlock(
+    this.next_gen_loc +((block_grid.length-1) * 25), this.gen_top + (this.last_path_block * 25), // Location 
+    BlockType.Death, // Block Type
+    block_grid, // The Block grid 
+    block_grid.length-1,this.last_path_block, // i, j
+    this.next_gen_loc); // Grid x 
+  this.blocks[index] = block;
   
   /** =========================== **/
   /** Convert grid to real blocks **/
@@ -361,7 +373,8 @@ GameLevel.prototype.generateChunk = function (){
       if (block_grid[i][j] !== BlockType.NoBlock){
         var index = this.nextBlockIndex();
         var block = generateBlock(block_grid[i][j], 
-            this.next_gen_loc +(i * 25), this.gen_top + ( j * 25), this.chunks[chunk_index]);
+            this.next_gen_loc +(i * 25), this.gen_top + ( j * 25), 
+            this.chunks[chunk_index]);
         this.blocks[index] = block;
       }
     }
@@ -462,7 +475,9 @@ GameLevel.prototype.resetOverflowGrid = function(){
 
 /** Check if the blocks above a block are clear **/
 GameLevel.prototype.clearAbove = function(grid, i, j){
-  if (this.isEmptySpace(grid, i-1,j) && this.isEmptySpace(grid, i-1,j-1) && this.isEmptySpace(grid, i,j-1) && this.isEmptySpace(grid, i+1,j-1) && this.isEmptySpace(grid, i+1,j)) 
+  if (this.isEmptySpace(grid, i-1,j) && this.isEmptySpace(grid, i-1,j-1) 
+    && this.isEmptySpace(grid, i,j-1) && this.isEmptySpace(grid, i+1,j-1) 
+    && this.isEmptySpace(grid, i+1,j)) 
     return true;
   return false;
 }

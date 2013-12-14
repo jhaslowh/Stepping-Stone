@@ -38,23 +38,23 @@ Debug.prototype.init = function(){
 	var material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   material.transparent = true;
 	this.debugMenu  = new THREE.Sprite( material );
-	this.debugMenu.position.set( WIDTH - 124, HEIGHT - 82, 0 );
-	this.debugMenu.scale.set( 228, 154, 1.0 );
+	this.debugMenu.position.set( WIDTH - 135, HEIGHT - 106, 0 );
+	this.debugMenu.scale.set( 270, 213, 1.0 );
 }
 
 /** Update Debug controls **/
 Debug.prototype.update = function(){
   if (this.on){
     // Fix cube location 
-    this.bumpCube.position.x = level.camera_loc.x;
-    this.bumpCube.position.y = level.camera_loc.y;
+    this.bumpCube.position.x = level.level_loc.x;
+    this.bumpCube.position.y = level.level_loc.y;
     this.bumpCube.rotation.x += .01;
     this.bumpCube.rotation.y += .01;
     
     // Lock player if true
     if (this.lockPlayer){
-      level.player.mesh.position.x = level.camera_loc.x;
-      level.player.mesh.position.y = level.camera_loc.y;
+      level.player.mesh.position.x = level.level_loc.x;
+      level.player.mesh.position.y = level.level_loc.y;
     }
   
     /** Update Controls **/
@@ -78,6 +78,9 @@ Debug.prototype.update = function(){
     // Turn on/off wall climbing 
     if (keyPressed(KEY_4))
       level.player.allow_roof_climbing = !level.player.allow_roof_climbing;
+    // Toggle Pathfinding line 
+    if (keyPressed(KEY_5))
+      DRAW_PATHFINDING = !DRAW_PATHFINDING;
     
     // Turn off debug mode 
     if (keyPressed(KEY_TILDE)){

@@ -230,7 +230,7 @@ Hud.prototype.init = function(w, h){
 /** initialize the text **/
 Hud.prototype.initText = function(){
   // Setup text sizes 
-  textLengths[0] = 130;
+  textLengths[0] = 140;
   textLengths[1] = 134;
   textLengths[2] = 150;
   textLengths[3] = 160;
