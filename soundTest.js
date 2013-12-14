@@ -18,8 +18,6 @@ function onError(){
 
 
 
-
-
 function playSound(buffer) {
   var source = context.createBufferSource(); // creates a sound source
   source.buffer = buffer;                    // tell the source which sound to play
@@ -53,8 +51,35 @@ function loadDogSound(url) {
   request.send();
 }
 
-loadDogSound('http://www.divided-games.com/CS425/james_test_stuff/shield_up_sound.mp3');
 
+var soundTwo = null;
+
+// Fix up prefixing
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var context = new AudioContext();
+
+
+function loadSecondSound(url) {
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true);
+  request.responseType = 'arraybuffer';
+
+  // Decode asynchronously
+  request.onload = function() {
+    context.decodeAudioData(request.response, function(buffer) {
+      soundTwo = buffer;
+      console.log("onload");
+      playSound(buffer);
+    }, onError);
+  }
+  request.send();
+}
+
+
+
+
+
+loadDogSound('http://www.divided-games.com/CS425/james_test_stuff/shield_up_sound.mp3');
 
 
 
