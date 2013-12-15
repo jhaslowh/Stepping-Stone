@@ -52,6 +52,8 @@ Block.prototype.draw = function(){}
 var path_material = new THREE.MeshLambertMaterial( { color: 0x99ff9b} );
 
 // Rock Material
+
+var texture = THREE.ImageUtils.loadTexture( 'res/rock.png' );
 var mapHeight = THREE.ImageUtils.loadTexture( 'res/rock.png' );
     mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
     mapHeight.format = THREE.RGBFormat;
@@ -70,13 +72,18 @@ var sand_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xff
 var UWRock_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x3e4a60, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
 
 // Dirt material 
-    mapHeight = THREE.ImageUtils.loadTexture( 'res/dirt.png' );
-    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
-    mapHeight.format = THREE.RGBFormat;
-var dirt_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xa67944, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 5, metal: false });
+mapHeight = THREE.ImageUtils.loadTexture( 'res/blocks/dirtb.png' );
+mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+mapHeight.format = THREE.RGBFormat;
+var dirt_material = new THREE.MeshPhongMaterial({ 
+      ambient: 0xffffff, color: 0xa67944, specular: 0x333333,
+      shininess: 0, bumpMap: mapHeight, bumpScale: 5, metal: false });
 
 // Grass material 
-var grass_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x59c964, specular: 0x333333, shininess: 0, metal: false });
+texture = THREE.ImageUtils.loadTexture( 'res/blocks/grass.png' );
+var grass_material = new THREE.MeshPhongMaterial({ 
+      ambient: 0xffffff, color: 0x59c964, specular: 0x333333, 
+      shininess: 0, metal: false, map: texture});
 
 // Time material 
 var texture = THREE.ImageUtils.loadTexture( 'res/time.png' );
@@ -330,6 +337,11 @@ DeathBlock.prototype.update = function(level){
     // Fix collision loc
     this.x = this.mesh.position.x - 12.5;
     this.y = this.mesh.position.y - 12.5;
+  }
+  // Kill block if path made and path finished following 
+  else if (this.pathMade){
+    this.active = false;
+    level.scene.remove(this.mesh);
   }
 
   // Block Rotation

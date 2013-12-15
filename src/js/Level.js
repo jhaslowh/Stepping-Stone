@@ -29,8 +29,8 @@ function GameLevel(){
   this.level_loc = {x:0,y:0};// Current camera location. Controled by level
   this.camera_zoom;           // Zoom for camera, auto calculated in init()
   this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
-  this.camera_max_tilt = 35;  // This is tilt down
-  this.camera_min_tilt = -15; // This is tilt up
+  this.camera_max_tilt = 10;  // This is tilt down
+  this.camera_min_tilt = -10; // This is tilt up
   this.scene;                 // Scene to hold all geometry 
   this.draw_correct_path = false; // Set to draw correct path to screen
   
@@ -52,7 +52,7 @@ function GameLevel(){
   this.level_width = 0;
   this.level_height = 1000;
   this.gen_chunk_width = 2000; // Width of a chunk 
-  this.pattern_types = 8; // Total number of patterns
+  this.pattern_types = 7; // Total number of patterns
   this.percent_for_timedrop = .1; // Percentage change to drop a time box 
   
   // States 
@@ -238,12 +238,16 @@ GameLevel.prototype.draw = function (renderer){
     new THREE.Vector3(1,0,0), this.camera_tilt * (Math.PI/180));
   // Apply matrix to location 
   cam_loc.applyProjection(matrix);
+  // Get y offset for camera 
+  var dy = (this.player.mesh.position.y - this.level_loc.y) * .5;
+  var yoff = this.level_loc.y + dy;
   // Move location to correct x and y values 
   cam_loc.x += this.level_loc.x;
-  cam_loc.y += this.level_loc.y;
+  cam_loc.y += yoff;
+
   
   this.camera.position.set( cam_loc.x, cam_loc.y, cam_loc.z );
-  this.camera.lookAt(new THREE.Vector3(this.level_loc.x,this.level_loc.y,0));
+  this.camera.lookAt(new THREE.Vector3(this.level_loc.x,yoff,0));
 
   // Draw blocks 
   for (var i = 0; i < this.blocks.length; i++)
@@ -703,34 +707,13 @@ GameLevel.prototype.gen_type5 = function(grid, type){
 }
 
 /** Generate a block shape that looks like the following 
- *    ##
- *
- *    ##
- *
- *    ##
+ *    #####
+ *    #####
+ *      #
+ *      #
+ *    #####
  **/
 GameLevel.prototype.gen_type6 = function(grid, type){
-  // Get a staring location 
-  var x = Math.round(Math.random() * (this.hor_blocks - 1));
-  var y = Math.round(Math.random() * (this.vert_blocks - 1));
-  
-  // Make shape 
-  this.setBlockInGrid(grid, x, y, type);
-  this.setBlockInGrid(grid, x + 1, y, type);
-  this.setBlockInGrid(grid, x, y + 2, type);
-  this.setBlockInGrid(grid, x + 1, y + 2, type);
-  this.setBlockInGrid(grid, x, y + 4, type);
-  this.setBlockInGrid(grid, x + 1, y + 4, type);
-}
-
-/** Generate a block shape that looks like the following 
- *    #####
- *    #####
- *      #
- *      #
- *    #####
- **/
-GameLevel.prototype.gen_type7 = function(grid, type){
   // Get a staring location 
   var x = Math.round(Math.random() * (this.hor_blocks - 1));
   var y = Math.round(Math.random() * (this.vert_blocks - 1));
@@ -763,7 +746,7 @@ GameLevel.prototype.gen_type7 = function(grid, type){
  *   ####
  *  ##  ##
  **/
-GameLevel.prototype.gen_type8 = function(grid, type){
+GameLevel.prototype.gen_type7 = function(grid, type){
   // Get a staring location 
   var x = Math.round(Math.random() * (this.hor_blocks - 1));
   var y = Math.round(Math.random() * (this.vert_blocks - 1));
