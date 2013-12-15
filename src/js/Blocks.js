@@ -251,7 +251,7 @@ function DeathBlock(x,y,type){
   // Movement nodes 
   this.moveNodes = [];
   // Movement speed 
-  this.speed = 50;
+  this.speed = 300;
   // Rotation speed 
   this.rSpeed = .02;
   // Light 
