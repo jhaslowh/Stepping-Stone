@@ -12,21 +12,21 @@ function loadSounds()
   //based on Slime Splash Sound
   splash_sound = document.createElement("audio");
   document.body.appendChild(splash_sound);
-  splash_sound.setAttribute("src", "res/splash_sound.mp3");
+  splash_sound.setAttribute("src", "res/sfx/splash_sound.mp3");
   //To use call splash_sound.play();
 
   //based on Laser Cannon Sound
   shield_up_sound = document.createElement("audio");
   document.body.appendChild(shield_up_sound);
-  shield_up_sound.setAttribute("src","res/shield_up_sound_m.wav");
+  shield_up_sound.setAttribute("src","res/sfx/shield_up_sound_m.mp3");
 
   //based on Laser Cannon Sound
   shield_down_sound = document.createElement("audio");
   document.body.appendChild(shield_down_sound);
-  shield_down_sound.setAttribute("src","res/shield_down_sound_m.wav");
+  shield_down_sound.setAttribute("src","res/sfx/shield_down_sound_m.mp3");
 
   //based on Computer Error Sound
   shield_cooldown_sound = document.createElement("audio");
   document.body.appendChild(shield_cooldown_sound);
-  shield_cooldown_sound.setAttribute("src","res/shield_cooldown_sound.mp3");
+  shield_cooldown_sound.setAttribute("src","res/sfx/shield_cooldown_sound.mp3");
 }

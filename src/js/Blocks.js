@@ -630,7 +630,14 @@ DeathBlock.prototype.addToOpenList = function(node, open,closed){
   }
   for (var i = 0; i < closed.length; i++){
     if (closed[i].loc.x == node.loc.x && closed[i].loc.y == node.loc.y)
+    {
+      // Might be wrong 
+      if (node.G < closed[i].G){
+        closed[i].G = node.G;
+        closed[i].parent = node.parent;
+      }
       return;
+    }
   }
 
   open.push(node);
