@@ -11,38 +11,26 @@ James Dressel
 
 In this game your objective is to not fall off the left side of the screen. This project was made for CS 425 as the final project for the class. 
 
-[Play latest version here.](http://www.divided-games.com/CS425/index.html)
+[Play latest version here.](http://www.divided-games.com/CS425/index.html)  
 [View Highscore Data](http://www.divided-games.com/CS425/php/highscore.php)
 
 **File Descriptions**
 
-* Game.js ::
-This is the main file for the game. It handles all of the I/O and also the game loop. 
-* Blocks.js ::
-Holds the basic structure for each block Also Handles drawing for each block. 
-* Level.js ::
-This is the main gameplay file. Level contains the level structure and all the objects needed to play a game. Level also will call all the update and draw functions for all of the other objects in the game. 
-* Player.js ::
-Contains the player objects and all code needed to make the player work. 
-* three.js ::
-Necessary 3D library for the project. 
-* IO.js ::
-I/O File for the game. Handles keyboard and mouse. 
-* Hud.js ::
-Does 2D screen drawing for the game. 
-* Debug.js ::
-Adds some debugging features to make showing the game in class easier. 
-* Sound.js ::
-Controls sound for the game. 
+* Game.js :: This is the main file for the game. It handles all of the I/O and also the game loop. 
+* Blocks.js :: Holds the basic structure for each block Also Handles drawing for each block. 
+* Level.js :: This is the main gameplay file. Level contains the level structure and all the objects needed to play a game. Level also will call all the update and draw functions for all of the other objects in the game. 
+* Player.js :: Contains the player objects and all code needed to make the player work. 
+* three.js :: Necessary 3D library for the project. 
+* IO.js :: I/O File for the game. Handles keyboard and mouse. 
+* Hud.js :: Does 2D screen drawing for the game. 
+* Debug.js :: Adds some debugging features to make showing the game in class easier. 
+* Sound.js :: Controls sound for the game. 
 
 **Controls**
 
-AWSD  : Move the player
-
-Q & E : Rotate the camera 
-
-R     : Restart game 
-
+AWSD  : Move the player  
+Q & E : Rotate the camera  
+R     : Restart game  
 P     : Pause game
 
 **Notes**
@@ -58,8 +46,11 @@ Currently using 2 spaces for each tab, if this is a problem we an switch to 4 sp
 
 **Project Technical Information**
 
+Hit the '~' key to enable the Debug menu. 
+
 Procedural Generation:  
-Terrain is generated on a chunk basic. Each chunk is n blocks long and m blocks high. The first thing that happens is the terrain is generated. After this we cut paths through the terrain so that the player will allways have a possible route. The the generated terrain is process and converted into different types of blocks based on its location in the level. And finaly the grid of blocks in converted into level blocks that are then added to the levels block list. 
+Terrain is generated on a chunk basic. Each chunk is n blocks long and m blocks high. The first thing that happens is the terrain is generated. After this we cut paths through the terrain so that the player will allways have a possible route. The the generated terrain is process and converted into different types of blocks based on its location in the level. And finaly the grid of blocks in converted into level blocks that are then added to the levels block list.  
+To see visual information about the generated path, hit '~' then '5'.  
 
 Points of Intrest:  
 Level.js, line 309, method generateChunk : Used to generate a block chunk  

@@ -248,11 +248,25 @@ function DeathBlock(x,y,type){
   this.pathMade = false;
   // Mesh of shape 
   this.mesh = -1;
+  // Movement nodes 
+  this.moveNodes = [];
+  // Movement speed 
+  this.speed = 300;
+  // Rotation speed 
+  this.rSpeed = .02;
 
   // Debug 
   this.debug_line = -1;
   this.debug_target = -1;
-  this.debug_cubes = new THREE.Scene();
+  this.debug_scene = new THREE.Scene();
+}
+
+// Used for moving death block
+function MoveNode(len, direc){
+  // Length of this node 
+  this.len = len;
+  // Direction the nodes goes in, form {x:[-1,0,1] y:[-1,0,1]}}
+  this.direc = direc;
 }
 
 // Update death block 
@@ -268,12 +282,46 @@ DeathBlock.prototype.update = function(level){
     this.findPath();
   }
 
+  // Block movement 
+  if (this.moveNodes.length != 0){
+    var move = this.speed * time_step;
+
+    while (move != 0 && this.moveNodes.length != 0){
+      if (move > this.moveNodes[this.moveNodes.length-1].len){
+        // Move block 
+        this.mesh.position.x += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.x;
+        this.mesh.position.y += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.y;
+        // Minus movement 
+        move -= this.moveNodes[this.moveNodes.length-1].len;
+        // Cut out node 
+        this.moveNodes.splice(this.moveNodes.length-1, 1);  
+      }else if (move < this.moveNodes[this.moveNodes.length-1].len){
+        // Move block 
+        this.mesh.position.x += move * this.moveNodes[this.moveNodes.length-1].direc.x;
+        this.mesh.position.y += move * this.moveNodes[this.moveNodes.length-1].direc.y;
+        // Minus movement 
+        this.moveNodes[this.moveNodes.length-1].len -= move;
+        move = 0;
+      }else if (move == this.moveNodes[this.moveNodes.length-1].len){
+        // Move block 
+        this.mesh.position.x += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.x;
+        this.mesh.position.y += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.y;
+        // Minus movement 
+        move = 0;
+        // Cut out node 
+        this.moveNodes.splice(this.moveNodes.length-1, 1); 
+      }
+    }
+  }
+
+  // Block Rotation
+  this.mesh.rotation.x += this.rSpeed;
+  this.mesh.rotation.y += this.rSpeed;
+
   // Check if block is off screen. 
   if (this.x < level.level_left() - 100){
     this.active = false;
     level.scene.remove(this.mesh);
-    if (this.debug_line != -1) level.scene.remove(this.debug_line);
-    if (this.degub_target != -1) level.scene.remove(this.debug_target);
   }
 }
 
@@ -281,16 +329,17 @@ DeathBlock.prototype.update = function(level){
 DeathBlock.prototype.collide = function(){
   if (this.block_type == BlockType.Death && this.picked_up == false){
     level.scene.remove(this.mesh);
-    if (this.debug_line != -1) level.scene.remove(this.debug_line);
-    if (this.degub_target != -1) level.scene.remove(this.debug_target);
     this.collides = false;
     this.picked_up = true;
+    this.active = false;
+
+    // TODO kill player if shield not up 
   }
 }
 
 /** Call to do any death block drawing */
 DeathBlock.prototype.draw = function(){
-  renderer.render(this.debug_cubes, level.camera);
+  renderer.render(this.debug_scene, level.camera);
 }
 
 // Pathfinding for death block 
@@ -339,12 +388,13 @@ DeathBlock.prototype.findPath = function(){
       temp = temp.parent;
     }
     this.debug_line = new THREE.Line(geom, material);
-    level.scene.add(this.debug_line);
+    this.debug_scene.add(this.debug_line);
+    material = new THREE.MeshBasicMaterial( { color: 0x00ff00} );
     var cube = new THREE.CubeGeometry( 14,14,14); 
-    this.debug_target = new THREE.Mesh(cube, path_material);
+    this.debug_target = new THREE.Mesh(cube, material);
     this.debug_target.position.x = this.goalLoc.x;
     this.debug_target.position.y = this.goalLoc.y;
-    level.scene.add(this.debug_target);
+    this.debug_scene.add(this.debug_target);
 
     // Make cubes 
     var cube = new THREE.CubeGeometry( 10,10,10); 
@@ -354,13 +404,13 @@ DeathBlock.prototype.findPath = function(){
       var mesh = new THREE.Mesh(cube, material2);
       mesh.position.x = closed[i].loc.x;
       mesh.position.y = closed[i].loc.y;
-      this.debug_cubes.add(mesh);
+      this.debug_scene.add(mesh);
     }
     for (var i = 0; i < open.length; i++){
       var mesh = new THREE.Mesh(cube, material);
       mesh.position.x = open[i].loc.x;
       mesh.position.y = open[i].loc.y;
-      this.debug_cubes.add(mesh);
+      this.debug_scene.add(mesh);
     }
 
   }
@@ -370,15 +420,36 @@ DeathBlock.prototype.findPath = function(){
   this.pathMade = true;
 
   // current is not equal to target, kill block 
-  if (current.loc.x != this.goalLoc.x && current.loc.y != this.goalLoc.y){
+  if ((current.loc.x == this.goalLoc.x && current.loc.y == this.goalLoc.y) == false){
     this.active = false;
     level.scene.remove(this.mesh);
     return;
   }
 
 
-  // TODO generate path movement 
+  // Generate path movement 
+  while (current.parent != -1){
+    // Get the length for the movement node 
+    var dx = current.loc.x - current.parent.loc.x;
+    var dy = current.loc.y - current.parent.loc.y;
+    var len = Math.round(Math.sqrt(((dx)*(dx)) + ((dy)*(dy))));
 
+    // Get the movement direction on the x-axis 
+    if (current.loc.x > current.parent.loc.x) dx = 1;
+    else if (current.loc.x < current.parent.loc.x) dx = -1;
+    else dx = 0;
+
+    // Get the movement direction on the x-axis 
+    if (current.loc.y > current.parent.loc.y) dy = 1;
+    else if (current.loc.y < current.parent.loc.y) dy = -1;
+    else dy = 0;
+
+    // Add the node 
+    this.moveNodes.push(new MoveNode(len, {x:dx,y:dy}));
+
+    // Move to next node 
+    current = current.parent;
+  }
 }
 
 // Add ajacent legal nodes to open list
@@ -548,10 +619,12 @@ DeathBlock.prototype.addToOpenList = function(node, open,closed){
 // Get death block 
 function getDeathBlock(x,y,type,grid,i,j,gridx){
   var cube = new THREE.CubeGeometry( 25,25,25); 
-  var mapHeight = THREE.ImageUtils.loadTexture( 'res/rock.png' );
+  var mapHeight = THREE.ImageUtils.loadTexture( 'res/death.png' );
   mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
   mapHeight.format = THREE.RGBFormat;
-  var material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xff0000, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
+  var material = new THREE.MeshPhongMaterial({ 
+    ambient: 0xffffff, color: 0xff0000, specular: 0x333333, 
+    shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
   var mesh = new THREE.Mesh(cube, material);
   mesh.position.x = x + 12.5;
   mesh.position.y = y + 12.5;
