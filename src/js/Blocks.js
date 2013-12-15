@@ -251,9 +251,11 @@ function DeathBlock(x,y,type){
   // Movement nodes 
   this.moveNodes = [];
   // Movement speed 
-  this.speed = 300;
+  this.speed = 50;
   // Rotation speed 
   this.rSpeed = .02;
+  // Light 
+  this.light;
 
   // Debug 
   this.debug_line = -1;
@@ -284,34 +286,50 @@ DeathBlock.prototype.update = function(level){
 
   // Block movement 
   if (this.moveNodes.length != 0){
-    var move = this.speed * time_step;
+    var move = Math.round(this.speed * time_step);
 
-    while (move != 0 && this.moveNodes.length != 0){
+    while (move > 0 && this.moveNodes.length != 0){
+      // Angle of the path 
+      var angle = Math.atan(
+                  Math.abs(this.moveNodes[this.moveNodes.length-1].direc.y)/
+                  Math.abs(this.moveNodes[this.moveNodes.length-1].direc.x));
+      var direc = this.moveNodes[this.moveNodes.length-1].direc;
+
       if (move > this.moveNodes[this.moveNodes.length-1].len){
         // Move block 
-        this.mesh.position.x += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.x;
-        this.mesh.position.y += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.y;
+        var dx = (Math.cos(angle) * this.moveNodes[this.moveNodes.length-1].len) * direc.x;
+        var dy = (Math.sin(angle) * this.moveNodes[this.moveNodes.length-1].len) * direc.y;
+        this.mesh.position.x += dx;
+        this.mesh.position.y += dy;
         // Minus movement 
         move -= this.moveNodes[this.moveNodes.length-1].len;
         // Cut out node 
         this.moveNodes.splice(this.moveNodes.length-1, 1);  
       }else if (move < this.moveNodes[this.moveNodes.length-1].len){
         // Move block 
-        this.mesh.position.x += move * this.moveNodes[this.moveNodes.length-1].direc.x;
-        this.mesh.position.y += move * this.moveNodes[this.moveNodes.length-1].direc.y;
+        var dx = (Math.cos(angle) * move) * direc.x;
+        var dy = (Math.sin(angle) * move) * direc.y;
+        this.mesh.position.x += dx;
+        this.mesh.position.y += dy;
         // Minus movement 
         this.moveNodes[this.moveNodes.length-1].len -= move;
         move = 0;
       }else if (move == this.moveNodes[this.moveNodes.length-1].len){
         // Move block 
-        this.mesh.position.x += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.x;
-        this.mesh.position.y += this.moveNodes[this.moveNodes.length-1].len * this.moveNodes[this.moveNodes.length-1].direc.y;
+        var dx = (Math.cos(angle) * this.moveNodes[this.moveNodes.length-1].len) * direc.x;
+        var dy = (Math.sin(angle) * this.moveNodes[this.moveNodes.length-1].len) * direc.y;
+        this.mesh.position.x += dx;
+        this.mesh.position.y += dy;
         // Minus movement 
         move = 0;
         // Cut out node 
         this.moveNodes.splice(this.moveNodes.length-1, 1); 
       }
     }
+
+    // Fix collision loc
+    this.x = this.mesh.position.x - 12.5;
+    this.y = this.mesh.position.y - 12.5;
   }
 
   // Block Rotation
@@ -328,12 +346,14 @@ DeathBlock.prototype.update = function(level){
 /** Called when the player collides with the block **/
 DeathBlock.prototype.collide = function(){
   if (this.block_type == BlockType.Death && this.picked_up == false){
+    // 
     level.scene.remove(this.mesh);
     this.collides = false;
     this.picked_up = true;
     this.active = false;
 
-    // TODO kill player if shield not up 
+    // Try and kill the player 
+    level.player.tryKill();
   }
 }
 
@@ -639,6 +659,9 @@ function getDeathBlock(x,y,type,grid,i,j,gridx){
   b.gridLoc.i = i;
   b.gridLoc.j = j;
   b.gridStartX = gridx;
+
+  var light = new THREE.PointLight( 0xFF0000, 5, 170);
+  b.mesh.add(light);
   
   level.scene.add(b.mesh);
   return b;

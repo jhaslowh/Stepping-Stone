@@ -269,8 +269,7 @@ Player.prototype.collisionResponse = function(){
     
   // Do death checks 
   if (this.mesh.position.x + this.w < level.level_left()){
-    this.alive = false;
-    level.gameover = true;
+    this.kill();
   }
   
   // Fix shield location 
@@ -312,6 +311,17 @@ Player.prototype.hitWater = function(){
     splash_sound.play();
   }
   this.hitGround();
+}
+
+/** Call to try and kill the player **/
+Player.prototype.tryKill = function(){
+  if (this.shieldCurrentTime <= 0) this.kill();
+}
+
+/** Call to kill player **/
+Player.prototype.kill = function(){
+  this.alive = false;
+  level.gameover = true;
 }
 
 /** Check block collision on x axis **/

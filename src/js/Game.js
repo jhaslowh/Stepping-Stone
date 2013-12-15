@@ -20,12 +20,15 @@ var renderer;
 var PLAY_SOUNDS = true;
 var FPS = 60; // Can only be changed at start of game 
 var time_step = (1000/FPS)/1000;
-var DRAW_PATHFINDING = true;
+var DRAW_PATHFINDING = false;
 var WIDTH = 0, HEIGHT = 0;
 
 // Beginning initialization 
 function init(){
+  
   initIO();
+  loadSounds();
+
   
   // Window size 
   WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
@@ -34,7 +37,6 @@ function init(){
   level.init(WIDTH,HEIGHT);
   hud.init(WIDTH, HEIGHT);
   debug.init();
-
   /** Setup renderer */
   // Create Renderer
   renderer = new THREE.WebGLRenderer();

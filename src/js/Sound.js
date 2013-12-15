@@ -7,7 +7,7 @@ var shield_up_sound;
 var shield_down_sound;
 var shield_cooldown_sound;
 
-function loadResources() 
+function loadSounds() 
 {
   //based on Slime Splash Sound
   splash_sound = document.createElement("audio");
@@ -18,18 +18,15 @@ function loadResources()
   //based on Laser Cannon Sound
   shield_up_sound = document.createElement("audio");
   document.body.appendChild(shield_up_sound);
-  shield_up_sound.setAttribute("src","res/shield_up_sound.mp3");
+  shield_up_sound.setAttribute("src","res/shield_up_sound_m.wav");
 
   //based on Laser Cannon Sound
   shield_down_sound = document.createElement("audio");
   document.body.appendChild(shield_down_sound);
-  shield_down_sound.setAttribute("src","res/shield_down_sound.mp3");
+  shield_down_sound.setAttribute("src","res/shield_down_sound_m.wav");
 
   //based on Computer Error Sound
   shield_cooldown_sound = document.createElement("audio");
   document.body.appendChild(shield_cooldown_sound);
   shield_cooldown_sound.setAttribute("src","res/shield_cooldown_sound.mp3");
-
 }
-
-loadResources();
