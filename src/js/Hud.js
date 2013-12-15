@@ -23,6 +23,9 @@ function Hud(){
   this.shieldBar;
   this.shieldOutline;
 
+  this.fuelBar;
+  this.fuelOutline;
+
   /** Sounds **/
   this.soundOnSprite;
   this.soundOffSprite;
@@ -76,6 +79,8 @@ Hud.prototype.update = function(){
   // Update shield state 
 	this.shieldBar.scale.set( (level.player.shieldCurrentRecharge / level.player.shieldRecharge) * 100, 20, 1.0 );
 
+  // Update fuel state 
+  this.fuelBar.scale.set((level.player.fuelCurrent / level.player.fuelMax) * 100, 20, 1.0);
 
   // Update Sound buttons 
   // Check if clicked
@@ -228,19 +233,35 @@ Hud.prototype.init = function(w, h){
   
   /** Shield **/
   texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_bar.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+  material = new THREE.SpriteMaterial( { map: texture, color:0xFF0000} );
   this.shieldBar  = new THREE.Sprite( material );
-  this.shieldBar.position.set( w/2, h - 25, 0 );
+  this.shieldBar.position.set( (w/2) - 60, h - 25, 0 );
   this.shieldBar.scale.set( 100, 20, 1.0 );
   this.scene.add( this.shieldBar  );
   
   texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_outline.png' );
   material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
   this.shieldOutline  = new THREE.Sprite( material );
-  this.shieldOutline.position.set( w/2, h - 25, 0 );
+  this.shieldOutline.position.set( (w/2) - 60, h - 25, 0 );
   this.shieldOutline.scale.set( 120, 40, 1.0 );
   this.scene.add( this.shieldOutline  );
 
+  /** Fuel **/
+  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_bar.png' );
+  material = new THREE.SpriteMaterial( { map: texture, color:0x0000FF} );
+  this.fuelBar  = new THREE.Sprite( material );
+  this.fuelBar.position.set( (w/2) + 60, h - 25, 0 );
+  this.fuelBar.scale.set( 100, 20, 1.0 );
+  this.scene.add( this.fuelBar  );
+  
+  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_outline.png' );
+  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+  this.fuelOutline  = new THREE.Sprite( material );
+  this.fuelOutline.position.set( (w/2) + 60, h - 25, 0 );
+  this.fuelOutline.scale.set( 120, 40, 1.0 );
+  this.scene.add( this.fuelOutline  );
+
+  /** Sound Toggle **/
   texture = THREE.ImageUtils.loadTexture( 'res/sound_on.png' );
   material = new THREE.SpriteMaterial( { map: texture } );
   material.transparent = true;

@@ -7,12 +7,16 @@ Members:
 Jonathan Haslow-Hall
 James Dressel
 
-**Project description**
+**Project Description**
 
 In this game your objective is to not fall off the left side of the screen. This project was made for CS 425 as the final project for the class. 
 
 [Play latest version here.](http://www.divided-games.com/CS425/index.html)  
 [View Highscore Data](http://www.divided-games.com/CS425/php/highscore.php)
+
+** Game Description & How to play **
+
+In this game you play a triangles whos goal is to stay alive. To do this you must stay on screen, falling off the left side of the screen will result in death. Periodically a Death Cube will be created that will head in your direction. If this cubes hits you, you will die and lose. You can survive from Death Cube attacks by hitting 'Space' when the cube is about to hit you. Current shield charge is shown at the top of the screen as a red bad. Next to that you will see a blue bar. This is your current fuel. If you are above water, your fuel will drain. Go back into water to refill you fuel. If your fuel runs out, you will lose. Score is tracked based on how far you make it. 
 
 **File Descriptions**
 
@@ -30,6 +34,7 @@ In this game your objective is to not fall off the left side of the screen. This
 
 AWSD  : Move the player  
 Q & E : Rotate the camera  
+Space : Activate Shield
 R     : Restart game  
 P     : Pause game
 
@@ -49,14 +54,20 @@ Currently using 2 spaces for each tab, if this is a problem we an switch to 4 sp
 Hit the '~' key to enable the Debug menu. 
 
 Procedural Generation:  
-Terrain is generated on a chunk basic. Each chunk is n blocks long and m blocks high. The first thing that happens is the terrain is generated. After this we cut paths through the terrain so that the player will allways have a possible route. The the generated terrain is process and converted into different types of blocks based on its location in the level. And finaly the grid of blocks in converted into level blocks that are then added to the levels block list.  
-To see visual information about the generated path, hit '~' then '5'.  
+Level terrain is generated in chunks. Each chunk is n blocks long and m blocks high. The first step of generation is the terrain grid is filled with blocks. This is done in two ways, either a premade pattern is added to the map or a virus block is added. When a virus block is added to the grid, it spreads into the area around it based on a spreading algorithm. Then we cut paths through the terrain so that the player will allways have a possible route. After this the terrain is checked to make sure there is no loner blocks (blocks not touching any other blocks) are still in the grid. Next the generated terrain is processed and converted into different types of blocks based on its location in the grid. And finaly the grid of blocks is converted into level blocks that are then added to the levels' block list.   
 
 Points of Intrest:  
-Level.js, line 309, method generateChunk : Used to generate a block chunk  
-Level.js, line 411, method makeCorrectPath : Use to cute a path through the terrain
+Level.js, method generateChunk : Used to generate a block chunk  
+Level.js, method makeCorrectPath : Use to cute a path through the terrain
+Level.js, method gen_type6, gen_type7, gen_type9 : Methods used to generate virus chunks 
 
 A* Motion Planning:
+The "Death Cube" in our game uses A* Pathfinding. When a Death Cube is made, it grabs the players current location and homes in on it. The Death Cube does not correct its path if the player moves, so it is possible to dodge the cube. 
+
+To see visual information about the A* Path, hit '~' then '5'. You must wait for a new path to be generated to see it. Will not show paths allready generated. 
+
+Points of Interest: 
+Blocks.js, function findPath : Uses A* to find a path from startLoc to the goalLoc
 
 
 Sound Design:

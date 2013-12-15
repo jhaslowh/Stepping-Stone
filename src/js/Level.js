@@ -91,7 +91,7 @@ GameLevel.prototype.init = function (w,h){
   this.scene = new THREE.Scene();
   
   /** Set up generation code */
-  this.next_gen_loc = this.level_loc.x + (this.level_width / 2);
+  this.next_gen_loc = 0;//this.level_loc.x + (this.level_width / 2);
   // Get the number of blocks that fit on the screen vertically divided by 2
   this.vert_blocks = Math.round((this.level_height / 25)) - 4;
   this.hor_blocks = Math.round((this.gen_chunk_width/ 25));
@@ -181,6 +181,9 @@ function game_over_run_once(score){
 
 /** Update the state of the level */
 GameLevel.prototype.update = function(){
+  // Check if player is dead 
+  if (!this.player.alive) gameover = true;
+
   // Stop game if gameover 
   if (this.gameover){
     game_over_run_once(this.score);
@@ -251,7 +254,7 @@ GameLevel.prototype.draw = function (renderer){
 
   // Draw blocks 
   for (var i = 0; i < this.blocks.length; i++)
-    if (this.blocks[i].active) this.blocks[i].draw();
+    this.blocks[i].draw();
   
   // Draw scene 
   renderer.render( this.scene, this.camera );
@@ -320,7 +323,6 @@ GameLevel.prototype.generateChunk = function (){
   /** =========================== **/
   for (var i = 0; i < this.chunks_per_gen; i ++){
     var type = Math.round(Math.random() * this.pattern_types);
-    console.log(type);
     var method = "this.gen_type" + type + "(block_grid, BlockType.Auto);";
     eval(method);
   } 

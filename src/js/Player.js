@@ -11,7 +11,7 @@ function Player(){
   this.speed = 450;
   this.mesh;
   
-  // Shield
+  /** Shield **/
   this.meshShield;
   // How long the shield is currently on for. Set to (shield time to set)
   this.shieldCurrentTime = 0;   
@@ -20,7 +20,13 @@ function Player(){
   // Current recharge time of the shield, if == to sheild recharge, then player can use shield   
   this.shieldCurrentRecharge = 10;
   // Time until shield can be used again
-  this.shieldRecharge = 10;      
+  this.shieldRecharge = 10; 
+
+  /** Fuel **/
+  this.fuelCurrent = 100;
+  this.fuelMax = 100;     // Fuel capacity 
+  this.fuelFillRate = 50; // Fuel to fill per second 
+  this.fuelLossRate = 6; // Fuel lost per second if not filling      
   
   // Physics 
   this.jumpt = 0;
@@ -62,7 +68,7 @@ Player.prototype.init = function(level){
   
   this.mesh = new THREE.Mesh(cube, material);
   this.mesh.position.x = level.level_width/2; 
-  this.mesh.position.y = level.water_level; 
+  this.mesh.position.y = -100; 
   this.mesh.castShadow = true;
   this.mesh.receiveShadow = true;
   level.scene.add(this.mesh);
@@ -128,6 +134,12 @@ Player.prototype.update = function(level){
           this.stopJump();
         }
       }
+
+      // Update fuel for not in water 
+      if (this.fuelCurrent > 0){
+        this.fuelCurrent -= this.fuelLossRate * time_step;
+        if (this.fuelCurrent < 0) this.fuelCurrent = 0;
+      }
     }
     // If player is below the water 
     else if (this.ny > level.water_level- (this.h/2) ){
@@ -145,6 +157,13 @@ Player.prototype.update = function(level){
         
       // Water gravity 
       this.ny += SINK_SPEED * time_step;
+
+
+      // Update fuel for in water 
+      if (this.fuelCurrent < this.fuelMax){
+        this.fuelCurrent += this.fuelFillRate * time_step;
+        if (this.fuelCurrent > this.fuelMax) this.fuelCurrent = this.fuelMax;
+      }
     }
       
     /** Check collision */
@@ -210,6 +229,8 @@ Player.prototype.checkCollision = function(level){
     //this.mesh.position.y = level.level_top();
     this.pass_y = false;
   }*/
+  if (this.nx > level.level_right())
+    this.pass_x = false;
   
   // Check if the player was above water and lands in it
   if (this.in_water == false && this.ny > level.water_level - (this.h/2)){
@@ -267,10 +288,13 @@ Player.prototype.collisionResponse = function(){
   if (this.air_t > this.minAirtForInAir)
     this.inAir = true;
     
-  // Do death checks 
-  if (this.mesh.position.x + this.w < level.level_left()){
+  /** Do death checks **/
+  // Check if off screen
+  if (this.mesh.position.x + this.w < level.level_left())
     this.kill();
-  }
+  // Check if out of fuel 
+  if (this.fuelCurrent <= 0)
+    this.kill();
   
   // Fix shield location 
   this.meshShield.position.x = this.mesh.position.x + 24;

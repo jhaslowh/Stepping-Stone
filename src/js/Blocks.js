@@ -284,8 +284,17 @@ DeathBlock.prototype.update = function(level){
   if (!this.pathMade && level.player.mesh.position.x >= this.gridStartX){
     // Set Goal 
     this.goalLoc.x = this.gridStartX + 12.5;
-    this.goalLoc.y = 
-      (Math.floor((level.player.mesh.position.y-level.gen_top)/ 25)*25) + 12.5;
+
+    // Check if player was above map
+    if (level.player.mesh.position.y < level.gen_top)
+      this.goalLoc.y = level.gen_top + 12.5;
+    else {
+      // Align goal to grid 
+      this.goalLoc.y = 
+        (Math.floor((level.player.mesh.position.y-level.gen_top)/ 25)*25) + 12.5;
+      // Fix location 
+      this.goalLoc.y += level.gen_top;
+    }
 
     // Gen path 
     this.findPath();

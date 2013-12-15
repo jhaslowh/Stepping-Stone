@@ -25,7 +25,6 @@ var WIDTH = 0, HEIGHT = 0;
 
 // Beginning initialization 
 function init(){
-  
   initIO();
   loadSounds();
 
