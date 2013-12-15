@@ -23,9 +23,9 @@ function GameLevel(){
   
   // Rendering 
   this.camera;
-  this.camera_move_speed = 1; // The camera will move to the right, player must keep up
+  this.camera_move_speed = 1.4; // The camera will move to the right, player must keep up
   this.camera_speed_max = 3;  // Max allowed camera speed 
-  this.camera_accel = .005;    // Camera acceleration per second 
+  this.camera_accel = .009;    // Camera acceleration per second 
   this.level_loc = {x:0,y:0};// Current camera location. Controled by level
   this.camera_zoom;           // Zoom for camera, auto calculated in init()
   this.camera_tilt = 0;       // Tilt angle for the camera. Rotation is around x axis 
@@ -52,7 +52,7 @@ function GameLevel(){
   this.level_width = 0;
   this.level_height = 1000;
   this.gen_chunk_width = 2000; // Width of a chunk 
-  this.pattern_types = 7; // Total number of patterns
+  this.pattern_types = 8; // Total number of patterns
   this.percent_for_timedrop = .1; // Percentage change to drop a time box 
   
   // States 
@@ -320,6 +320,7 @@ GameLevel.prototype.generateChunk = function (){
   /** =========================== **/
   for (var i = 0; i < this.chunks_per_gen; i ++){
     var type = Math.round(Math.random() * this.pattern_types);
+    console.log(type);
     var method = "this.gen_type" + type + "(block_grid, BlockType.Auto);";
     eval(method);
   } 
@@ -329,6 +330,26 @@ GameLevel.prototype.generateChunk = function (){
   /** =========================== **/
   this.makeCorrectPath(block_grid, this.last_path_block, 0);
   this.makeCorrectPath(block_grid, this.last_path_block2, 1);
+
+  /** =========================== **/
+  /**   Remove loners             **/
+  /** =========================== **/
+
+  // This is used to make terrain look cleaner
+  for (var i = 0; i < block_grid.length; i++){
+    for (var j = 0; j < block_grid[i].length; j++){
+      // If there is a block in this space, check if it is auto 
+      if (block_grid[i][j] == BlockType.Auto){
+        var left = this.isEmptySpace(block_grid, i-1, j);
+        var right = this.isEmptySpace(block_grid, i+1, j);
+        var top = this.isEmptySpace(block_grid, i, j-1);
+        var bottom = this.isEmptySpace(block_grid, i, j+1);
+
+        if (left && right && top && bottom) 
+          block_grid[i][j] = BlockType.NoBlock;
+      }
+    }
+  }
 
   /** =========================== **/ 
   /** Make a death block          **/
@@ -517,7 +538,8 @@ GameLevel.prototype.clearAroundTop = function(grid, i, j){
 
 /** Return true if spot in grid is an empty space **/
 GameLevel.prototype.isEmptySpace = function(grid, i, j){
-  if (j < 0 || i >= this.hor_blocks || i < 0){
+  // Assume it is empty if off grid
+  if (!this.validGridLoc({i:i, j:j})){
     return true;
   }
   if (grid[i][j] == BlockType.NoBlock ||
@@ -529,13 +551,22 @@ GameLevel.prototype.isEmptySpace = function(grid, i, j){
 
 /** Return true if spot in grid is an filled space **/
 GameLevel.prototype.isFilledSpace = function(grid, i, j){
-  if (j < 0 || i >= this.hor_blocks || i < 0){
+  // Assume it is filled if offgrid 
+  if (!this.validGridLoc({i:i, j:j})){
     return true;
   }
   if (grid[i][j] == BlockType.Auto){
     return true;
   }
   return false;
+}
+
+/** Check if the grid location is valid **/
+GameLevel.prototype.validGridLoc = function(gridLoc){
+  if (gridLoc.i < 0 || gridLoc.i >= this.hor_blocks 
+    || gridLoc.j < 0 || gridLoc.j >= this.vert_blocks)
+    return false;
+  return true;
 }
 
 /** Helper method to set a block in a block grid. 
@@ -558,9 +589,10 @@ GameLevel.prototype.setPathBlockInGrid = function(grid, i, j, type){
     grid[i][j] = type;
   
   // Place block below path if above water. 
+  // Note: Loner removal may delete this block 
   j++;
   var place_block = Math.random();
-  if (i >= 0 && i < this.hor_blocks && j >= 0 && j < this.vert_blocks && 
+  if (i >= 0 && i < this.hor_blocks && j >= 0 && 
       // Make sure block isnt path block 
       grid[i][j] != BlockType.Path && 
       // Random to decide whether to place 
@@ -669,51 +701,13 @@ GameLevel.prototype.gen_type3 = function(grid, type){
 }
 
 /** Generate a block shape that looks like the following 
- *       #
- *     ##
- *     ##
- *    #  
+ *    #####
+ *    #####
+ *      #
+ *      #
+ *    #####
  **/
 GameLevel.prototype.gen_type4 = function(grid, type){
-  // Get a staring location 
-  var x = Math.round(Math.random() * (this.hor_blocks - 1));
-  var y = Math.round(Math.random() * (this.vert_blocks - 1));
-  
-  // Make shape 
-  this.setBlockInGrid(grid, x, y, type);
-  this.setBlockInGrid(grid, x + 1, y - 1, type);
-  this.setBlockInGrid(grid, x + 2, y - 2, type);
-  this.setBlockInGrid(grid, x + 3, y - 3, type);
-  this.setBlockInGrid(grid, x + 1, y - 2, type);
-  this.setBlockInGrid(grid, x + 2, y - 1, type);
-}
-
-/** Generate a block shape that looks like the following 
- *    ####
- *     ##
- **/
-GameLevel.prototype.gen_type5 = function(grid, type){
-  // Get a staring location 
-  var x = Math.round(Math.random() * (this.hor_blocks - 1));
-  var y = Math.round(Math.random() * (this.vert_blocks - 1));
-  
-  // Make shape 
-  this.setBlockInGrid(grid, x, y, type);
-  this.setBlockInGrid(grid, x + 1, y, type);
-  this.setBlockInGrid(grid, x + 2, y, type);
-  this.setBlockInGrid(grid, x + 3, y, type);
-  this.setBlockInGrid(grid, x + 1, y + 1, type);
-  this.setBlockInGrid(grid, x + 2, y + 1, type);
-}
-
-/** Generate a block shape that looks like the following 
- *    #####
- *    #####
- *      #
- *      #
- *    #####
- **/
-GameLevel.prototype.gen_type6 = function(grid, type){
   // Get a staring location 
   var x = Math.round(Math.random() * (this.hor_blocks - 1));
   var y = Math.round(Math.random() * (this.vert_blocks - 1));
@@ -746,7 +740,7 @@ GameLevel.prototype.gen_type6 = function(grid, type){
  *   ####
  *  ##  ##
  **/
-GameLevel.prototype.gen_type7 = function(grid, type){
+GameLevel.prototype.gen_type5 = function(grid, type){
   // Get a staring location 
   var x = Math.round(Math.random() * (this.hor_blocks - 1));
   var y = Math.round(Math.random() * (this.vert_blocks - 1));
@@ -762,6 +756,160 @@ GameLevel.prototype.gen_type7 = function(grid, type){
   this.setBlockInGrid(grid, x - 1, y + 2, type);
   this.setBlockInGrid(grid, x + 2, y + 2, type);
   this.setBlockInGrid(grid, x + 3, y + 2, type);
+}
+
+/** Viral node type 1 **/
+GameLevel.prototype.gen_type6 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+
+  // Lists 
+  var open = [];   // List of nodes to go through
+  var closed = []; // List of finished nodes 
+
+  // Starting node 
+  open.push(new ViralNode(x,y,1));
+
+  // Spread Virus
+  while (open.length != 0){
+    open[0].addNeighbors(open, closed, .5);
+    closed.push(open[0]);
+    open.splice(0, 1);
+  }
+
+  // Put blocks into grid 
+  for (var i = 0; i < closed.length; i++){
+    grid[closed[i].i][closed[i].j] = type;
+  }
+}
+
+/** Viral node type 2 **/
+GameLevel.prototype.gen_type7 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+
+  // Lists 
+  var open = [];   // List of nodes to go through
+  var closed = []; // List of finished nodes 
+
+  // Starting node 
+  open.push(new ViralNode(x,y,1));
+
+  // Spread Virus
+  while (open.length != 0){
+    open[0].addNeighbors(open, closed, .4);
+    closed.push(open[0]);
+    open.splice(0, 1);
+  }
+
+  // Put blocks into grid 
+  for (var i = 0; i < closed.length; i++){
+    grid[closed[i].i][closed[i].j] = type;
+  }
+}
+
+/** Viral node type 3 **/
+GameLevel.prototype.gen_type8 = function(grid, type){
+  // Get a staring location 
+  var x = Math.round(Math.random() * (this.hor_blocks - 1));
+  var y = Math.round(Math.random() * (this.vert_blocks - 1));
+
+  // Lists 
+  var open = [];   // List of nodes to go through
+  var closed = []; // List of finished nodes 
+
+  // Starting node 
+  open.push(new ViralNode(x,y,1));
+
+  // Spread Virus
+  while (open.length != 0){
+    open[0].addNeighbors(open, closed, .3);
+    closed.push(open[0]);
+    open.splice(0, 1);
+  }
+
+  // Put blocks into grid 
+  for (var i = 0; i < closed.length; i++){
+    grid[closed[i].i][closed[i].j] = type;
+  }
+}
+
+/** ============================================= **/
+/**      The below is used for viral generation **/
+/** ============================================= **/ 
+
+/** A viral noded used to generate other viral nodes **/
+function ViralNode(i,j,percent){
+  this.i = i;
+  this.j = j;
+  this.percent = percent;
+}
+
+/** Add neighbors of this node to open list.
+ * open: neighbors to look at
+ * closed: allready looked at nodes
+ * frac: amount to divided percent by. **/
+ViralNode.prototype.addNeighbors = function(open, closed, frac){
+  var per = this.percent * frac;
+
+  // Add left 
+  if (Math.random() < per){
+    var node = new ViralNode(this.i-1,this.j,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add top left
+  if (Math.random() < per){
+    var node = new ViralNode(this.i-1,this.j-1,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add top 
+  if (Math.random() < per){
+    var node = new ViralNode(this.i,this.j-1,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add top right
+  if (Math.random() < per){
+    var node = new ViralNode(this.i+1,this.j-1,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add right
+  if (Math.random() < per){
+    var node = new ViralNode(this.i+1,this.j,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add bottom right 
+  if (Math.random() < per){
+    var node = new ViralNode(this.i+1,this.j+1,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add bottom  
+  if (Math.random() < per){
+    var node = new ViralNode(this.i,this.j+1,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+
+  // Add bottom  
+  if (Math.random() < per){
+    var node = new ViralNode(this.i+1,this.j-1,per);
+    if (level.validGridLoc(node)) addViralToList(node,open,closed);
+  }
+}
+
+/** Try and add node to the open or closed list **/
+function addViralToList(node, open, closed){
+  for (var i = 0; i < open.length; i++)
+    if (open[i].i == node.i && open[i].j == node.j) return;
+  for (var i = 0; i < closed.length; i++)
+    if (closed[i].i == node.i && closed[i].j == node.j) return;
+  open.push(node);
 }
 
 

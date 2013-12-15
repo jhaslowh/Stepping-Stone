@@ -444,7 +444,6 @@ DeathBlock.prototype.findPath = function(){
       mesh.position.y = open[i].loc.y;
       this.debug_scene.add(mesh);
     }
-
   }
 
   // Get rid of grid 
