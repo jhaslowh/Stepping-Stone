@@ -81,6 +81,7 @@ function gameLoop()
   renderer.clear();
   level.draw(renderer);
   hud.draw(renderer);
+  debug.draw();
 }
 
 // Setup game 

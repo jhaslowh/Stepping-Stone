@@ -14,9 +14,12 @@ In this game your objective is to not fall off the left side of the screen. This
 [Play latest version here.](http://www.divided-games.com/CS425/index.html)  
 [View Highscore Data](http://www.divided-games.com/CS425/php/highscore.php)
 
-** Game Description & How to play **
+**Game Description & How to play**
 
-In this game you play a triangles whos goal is to stay alive. To do this you must stay on screen, falling off the left side of the screen will result in death. Periodically a Death Cube will be created that will head in your direction. If this cubes hits you, you will die and lose. You can survive from Death Cube attacks by hitting 'Space' when the cube is about to hit you. Current shield charge is shown at the top of the screen as a red bad. Next to that you will see a blue bar. This is your current fuel. If you are above water, your fuel will drain. Go back into water to refill you fuel. If your fuel runs out, you will lose. Score is tracked based on how far you make it. 
+In this game you play a triangles whos goal is to stay alive. To do this you must stay on screen, falling off the left side of the screen will result in death. Periodically a Death Cube will be created that will head in your direction. If this cubes hits you, you will die and lose. You can survive from Death Cube attacks by hitting 'Space' when the cube is about to hit you. Current shield charge is shown at the top of the screen as a red bad. Next to that you will see a blue bar. This is your current fuel. If you are above water, your fuel will drain. Go back into water to refill you fuel. If your fuel runs out, you will lose. Score is tracked based on how far you make it. As you play the game, the camera will start to move faster. You can pick up yellow time cubes to slow it down. 
+
+You use WASD to move the player around. If you are underwater you will move in all four directions. If you are above water you can only move left or right. While you are above water, you can jump and climb on ceilings. To jump just press 'W' while above water. And to stick to a ceiling, hold 'W' when you hit a ceiling. 
+
 
 **File Descriptions**
 
@@ -32,7 +35,7 @@ In this game you play a triangles whos goal is to stay alive. To do this you mus
 
 **Controls**
 
-AWSD  : Move the player  
+WASD  : Move the player  
 Q & E : Rotate the camera  
 Space : Activate Shield
 R     : Restart game  

@@ -14,9 +14,15 @@ function Debug(){
   this.showBumpCube = false; // Show a bump map cube 
   this.lockPlayer = false;   // Lock player to center of screen, possibly will glitch player
   
-  // 
+  // Sprites 
   this.bumpCube;
   this.debugMenu;
+  // Scenes
+  this.onLight;
+  this.offLight;
+
+  // Light positions 
+  this.lightLoc = [];
 }
 
 /** Set up debug method **/
@@ -35,11 +41,32 @@ Debug.prototype.init = function(){
   
   // Make debug menu
   var texture = THREE.ImageUtils.loadTexture( 'res/DebugMenu.png' );
-	var material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
+	var material = new THREE.SpriteMaterial( { map: texture} );
   material.transparent = true;
 	this.debugMenu  = new THREE.Sprite( material );
-	this.debugMenu.position.set( WIDTH - 135, HEIGHT - 106, 0 );
-	this.debugMenu.scale.set( 270, 213, 1.0 );
+	this.debugMenu.position.set( WIDTH - 138, HEIGHT - 138, 0 );
+	this.debugMenu.scale.set( 265, 265, 1.0 );
+
+  // Load Debug menu lights 
+  texture = THREE.ImageUtils.loadTexture( 'res/debug_light.png' );
+  material = new THREE.SpriteMaterial( { map: texture, color:0xFF0000} );
+  var sprite  = new THREE.Sprite( material );
+  sprite.scale.set( 14, 14, 1.0 );
+  this.offLight = new THREE.Scene();
+  this.offLight.add(sprite);
+
+  material = new THREE.SpriteMaterial( { map: texture, color:0x00FF00} );
+  var sprite  = new THREE.Sprite( material );
+  sprite.scale.set( 14, 14, 1.0 );
+  this.onLight = new THREE.Scene();
+  this.onLight.add(sprite);
+
+  // Fix locations
+  this.lightLoc[0] = {x:WIDTH-266+10,y:HEIGHT-56};
+  this.lightLoc[1] = {x:WIDTH-266+10,y:HEIGHT-73};
+  this.lightLoc[2] = {x:WIDTH-266+10,y:HEIGHT-90};
+  this.lightLoc[3] = {x:WIDTH-266+10,y:HEIGHT-126};
+  this.lightLoc[4] = {x:WIDTH-266+10,y:HEIGHT-143};
 }
 
 /** Update Debug controls **/
@@ -94,6 +121,56 @@ Debug.prototype.update = function(){
     if (keyPressed(KEY_TILDE)){
       this.on = true;
       hud.scene.add(this.debugMenu);
+    }
+  }
+}
+
+/** Draw Debug info **/
+Debug.prototype.draw = function(){
+  if (this.on){
+    // Draw Debug Menu Item 1
+    if (this.showBumpCube){
+      this.onLight.children[0].position.set(this.lightLoc[0].x,this.lightLoc[0].y,0);
+      renderer.render(this.onLight, hud.camera);
+    }else {
+      this.offLight.children[0].position.set(this.lightLoc[0].x,this.lightLoc[0].y,0);
+      renderer.render(this.offLight, hud.camera);
+    }
+
+    // Draw Debug Menu Item 2
+    if (this.lockPlayer){
+      this.onLight.children[0].position.set(this.lightLoc[1].x,this.lightLoc[1].y,0);
+      renderer.render(this.onLight, hud.camera);
+    }else {
+      this.offLight.children[0].position.set(this.lightLoc[1].x,this.lightLoc[1].y,0);
+      renderer.render(this.offLight, hud.camera);
+    }
+
+    // Draw Debug Menu Item 3
+    if (level.draw_correct_path){
+      this.onLight.children[0].position.set(this.lightLoc[2].x,this.lightLoc[2].y,0);
+      renderer.render(this.onLight, hud.camera);
+    }else {
+      this.offLight.children[0].position.set(this.lightLoc[2].x,this.lightLoc[2].y,0);
+      renderer.render(this.offLight, hud.camera);
+    }
+
+    // Draw Debug Menu Item 4
+    if (level.player.allow_roof_climbing){
+      this.onLight.children[0].position.set(this.lightLoc[3].x,this.lightLoc[3].y,0);
+      renderer.render(this.onLight, hud.camera);
+    }else {
+      this.offLight.children[0].position.set(this.lightLoc[3].x,this.lightLoc[3].y,0);
+      renderer.render(this.offLight, hud.camera);
+    }
+
+    // Draw Debug Menu Item 5
+    if (DRAW_PATHFINDING){
+      this.onLight.children[0].position.set(this.lightLoc[4].x,this.lightLoc[4].y,0);
+      renderer.render(this.onLight, hud.camera);
+    }else {
+      this.offLight.children[0].position.set(this.lightLoc[4].x,this.lightLoc[4].y,0);
+      renderer.render(this.offLight, hud.camera);
     }
   }
 }
