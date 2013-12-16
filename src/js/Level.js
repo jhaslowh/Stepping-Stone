@@ -12,7 +12,9 @@ function GameLevel(){
   this.water_level;           // Y value for sea level. set in init()
   this.water_size = 4000;     // Width for water and sea floor.
   this.sea_floor;             // Sea floor mesh, created in init()
-  this.sea_floor_2;             
+  this.sea_floor_2;      
+  this.sea_floor_bottom_;             
+  this.sea_floor_bottom_2;                    
   // Lights
   this.hem_light;             
   this.direct_light;
@@ -129,12 +131,24 @@ GameLevel.prototype.init = function (w,h){
   this.sea_floor.receiveShadow = true;
   this.sea_floor.position.x = this.level_loc.x;
   this.sea_floor.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
+  this.sea_floor_bottom = new THREE.Mesh(c, material);
+  this.sea_floor_bottom.receiveShadow = true;
+  this.sea_floor_bottom.position.x = this.level_loc.x;
+  this.sea_floor_bottom.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2) + 160;
+
   this.sea_floor2 = new THREE.Mesh(c, material);
   this.sea_floor2.receiveShadow = true;
   this.sea_floor2.position.x = this.level_loc.x + this.water_size;
   this.sea_floor2.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2);
+  this.sea_floor_bottom_2 = new THREE.Mesh(c, material);
+  this.sea_floor_bottom_2.receiveShadow = true;
+  this.sea_floor_bottom_2.position.x = this.level_loc.x + this.water_size;
+  this.sea_floor_bottom_2.position.y = this.gen_bottom + (this.sea_floor.geometry.height/2) + 160;
+
   this.scene.add(this.sea_floor);
   this.scene.add(this.sea_floor2);
+  this.scene.add(this.sea_floor_bottom);
+  this.scene.add(this.sea_floor_bottom_2);
   
   /** Set up lights */
   // Hemisphere light
@@ -268,10 +282,14 @@ GameLevel.prototype.fix_water_level = function (){
 /** Set the water location based on camera location */
 GameLevel.prototype.fix_water_loc = function(){
   this.water_cube.position.x = this.level_loc.x;
-  if (this.sea_floor.position.x < this.level_loc.x - this.water_size)
+  if (this.sea_floor.position.x < this.level_loc.x - this.water_size){
     this.sea_floor.position.x = this.sea_floor2.position.x + this.water_size;
-  if (this.sea_floor2.position.x < this.level_loc.x - this.water_size)
+    this.sea_floor_bottom.position.x = this.sea_floor.position.x;
+  }
+  if (this.sea_floor2.position.x < this.level_loc.x - this.water_size){
     this.sea_floor2.position.x = this.sea_floor.position.x + this.water_size;
+    this.sea_floor_bottom_2.position.x = this.sea_floor_2.position.x;
+  }
 }
 
 /** Fix the light location based off of the camera */
