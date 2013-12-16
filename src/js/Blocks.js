@@ -53,11 +53,13 @@ var path_material = new THREE.MeshLambertMaterial( { color: 0x99ff9b} );
 
 // Rock Material
 
-var texture = THREE.ImageUtils.loadTexture( 'res/rock.png' );
-var mapHeight = THREE.ImageUtils.loadTexture( 'res/rock.png' );
+var texture = THREE.ImageUtils.loadTexture( 'res/blocks/rock.png' );
+var mapHeight = THREE.ImageUtils.loadTexture( 'res/blocks/rockb.png' );
     mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
     mapHeight.format = THREE.RGBFormat;
-var rock_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x737980, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
+var rock_material = new THREE.MeshPhongMaterial({ 
+    ambient: 0xffffff, color: 0xffffff, specular: 0x333333, map:texture,
+    shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
 
 // Sand Material
     mapHeight = THREE.ImageUtils.loadTexture( 'res/sand.png' );
@@ -72,11 +74,12 @@ var sand_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0xff
 var UWRock_material = new THREE.MeshPhongMaterial({ ambient: 0xffffff, color: 0x3e4a60, specular: 0x333333, shininess: 0, bumpMap: mapHeight, bumpScale: 20, metal: false });
 
 // Dirt material 
+texture = THREE.ImageUtils.loadTexture( 'res/blocks/dirt.png' );
 mapHeight = THREE.ImageUtils.loadTexture( 'res/blocks/dirtb.png' );
 mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 mapHeight.format = THREE.RGBFormat;
 var dirt_material = new THREE.MeshPhongMaterial({ 
-      ambient: 0xffffff, color: 0xa67944, specular: 0x333333,
+      ambient: 0xffffff, color: 0xa67944, specular: 0x333333, map:texture,
       shininess: 0, bumpMap: mapHeight, bumpScale: 5, metal: false });
 
 // Grass material 
