@@ -42,7 +42,7 @@ Controls
 
 WASD  : Move the player  
 Q & E : Rotate the camera  
-Space : Activate Shield
+Space : Activate Shield  
 R     : Restart game  
 P     : Pause game
 
@@ -59,7 +59,7 @@ Project Technical Information
 Hit the '~' key to enable the Debug menu. 
 
 **Procedural Generation**  
-Level terrain is generated in chunks. Each chunk is n blocks long and m blocks high. The first step of generation is the terrain grid is filled with blocks. This is done in two ways, either a premade pattern is added to the map or a virus block is added. When a virus block is added to the grid, it spreads into the area around it based on a spreading algorithm. Then we cut paths through the terrain so that the player will allways have a possible route. After this the terrain is checked to make sure there is no loner blocks (blocks not touching any other blocks) are still in the grid. Next the generated terrain is processed and converted into different types of blocks based on its location in the grid. And finaly the grid of blocks is converted into level blocks that are then added to the levels' block list.   
+Level terrain is generated in chunks. Each chunk is n blocks long and m blocks high. The first step of generation is the terrain grid is filled with blocks. This is done in two ways, either a premade pattern is added to the grid or a virus block is added. When a virus block is added to the grid, it spreads into the area around it based on a spreading algorithm. Then we cut paths through the terrain so that the player will allways have a possible route. After this the terrain is checked to make sure there is no loner blocks (blocks not touching any other blocks) still in the grid. Next the generated terrain is processed and converted into different types of blocks based on its location in the grid. And finaly the grid of blocks is converted into level blocks that are then added to the levels' block list.   
 
 Points of Intrest:  
 Level.js, method generateChunk : Used to generate a block chunk  
@@ -69,7 +69,7 @@ Level.js, method gen_type6, gen_type7, gen_type9 : Methods used to generate viru
 **A* Motion Planning**  
 The "Death Cube" in our game uses A* Pathfinding. When a Death Cube is made, it grabs the players current location and homes in on it. The Death Cube does not correct its path if the player moves, so it is possible to dodge the cube. 
 
-To see visual information about the A* Path, hit '~' then '5'. You must wait for a new path to be generated to see it. Will not show paths allready generated. 
+To see visual information about the A* Path, hit '~' then '5'. You must wait for a new path to be generated to see it, it will not show paths allready generated. 
 
 Points of Interest: 
 Blocks.js, function findPath : Uses A* to find a path from startLoc to the goalLoc
