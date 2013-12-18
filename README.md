@@ -102,4 +102,10 @@ for a new path to be generated to see it, it will not show paths allready genera
 Points of Interest: 
 Blocks.js, function findPath : Uses A* to find a path from startLoc to the goalLoc
 
+**AJAX**  
+A small amount of AJAX is used to send player scores to the server. You can
+view [the highscore](http://www.divided-games.com/CS425/php/highscore.php). 
+Currently the php script saves the highscore to a textfile. A future improvement
+would be to use a database to keep track of multiple scores. 
+
 
