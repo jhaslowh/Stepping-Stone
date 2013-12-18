@@ -78,7 +78,7 @@ Player.prototype.init = function(level){
   var texture = THREE.ImageUtils.loadTexture( 'res/shield.png' );
   texture.format = THREE.RGBFormat;
   material = new THREE.MeshPhongMaterial({color: 0xffffff,map:texture});
-  material.opacity = .5;
+  material.opacity = 0;
   material.transparent = true;
   this.meshShield = new THREE.Mesh(circle, material);
   level.scene.add(this.meshShield);

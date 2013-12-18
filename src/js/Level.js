@@ -58,7 +58,7 @@ function GameLevel(){
   this.percent_for_timedrop = .1; // Percentage change to drop a time box 
   
   // States 
-  this.paused = false;      
+  this.paused = true;      
   this.gameover = false;
   this.gameover_ran = false;
 }

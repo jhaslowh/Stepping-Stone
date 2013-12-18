@@ -1,8 +1,3 @@
-/**
- * NOTE: 0,0 is in the bottom left corner for this camera. 
- * Positive x is right and positive y is up 
- **/
-
 /** Structure to hold hud data **/
 function Hud(){
   this.camera;      // Camera to draw all hud elements 
@@ -10,8 +5,7 @@ function Hud(){
   
   /** Tutorial **/
   this.show_tut = false; 
-  this.tutTime = 14;      // Time to show tut at beginning of game 
-  this.tutFadePerSec = 2.5; // Time to fade out tutorial 
+  this.tutFadePerSec = 3; // Time to fade out tutorial 
   this.tutSprite;         // Use to edit sprite values 
   
   this.pauseSprite;       // Used to draw paused text to screen
@@ -37,23 +31,12 @@ function Hud(){
 
 /** Update hud state **/
 Hud.prototype.update = function(){
-  // Decrement tut time 
-  if (this.tutTime != 0){
-    this.tutTime -= time_step;
-    if (this.tutTime < 0){
-      this.tutTime = 0;
-    }
-  }
-  
   // Show tut if paused
-  if (level.paused){
+  if (level.paused)
     this.show_tut = true;
-    this.pauseSprite.material.opacity = 1;
-  }
-  else {
+  else 
     this.show_tut = false;
-    this.pauseSprite.material.opacity = 0;
-  }
+
   
   // Show gameover text
   if (level.gameover)
@@ -62,13 +45,14 @@ Hud.prototype.update = function(){
     this.gameoverSprite.material.opacity = 0;
   
   // Fade tut if not shown 
-  if (this.show_tut || this.tutTime > 0)
+  if (this.show_tut)
     this.tutSprite.material.opacity = 1;
   else if (this.tutSprite.material.opacity != 0){
     this.tutSprite.material.opacity -= this.tutFadePerSec * time_step;
     if (this.tutSprite.material.opacity < 0)
       this.tutSprite.material.opacity = 0;
   }
+  this.pauseSprite.material.opacity = this.tutSprite.material.opacity;
   
   // Find out if warning should be drawn
   if (level.player.nx < level.level_left() + 200 && !level.gameover)
@@ -77,10 +61,10 @@ Hud.prototype.update = function(){
     this.warningSprite.material.opacity = 0;
     
   // Update shield state 
-	this.shieldBar.scale.set( (level.player.shieldCurrentRecharge / level.player.shieldRecharge) * 100, 20, 1.0 );
+	this.shieldBar.scale.set( (level.player.shieldCurrentRecharge / level.player.shieldRecharge) , 1.0, 1.0 );
 
   // Update fuel state 
-  this.fuelBar.scale.set((level.player.fuelCurrent / level.player.fuelMax) * 100, 20, 1.0);
+  this.fuelBar.scale.set((level.player.fuelCurrent / level.player.fuelMax), 1.0, 1.0);
 
   // Update Sound buttons 
   // Check if clicked
@@ -109,6 +93,45 @@ Hud.prototype.draw = function(renderer){
     this.levelScoreSize,s);
 }
 
+/** Make a sprite **/
+function makeSprite(width, height, texPath){
+  // Load the texture file 
+  var texture = null;
+  if (texPath != null) texture = THREE.ImageUtils.loadTexture(texPath);
+  // Make a new basic material and give it the texture 
+  var mat = new THREE.MeshBasicMaterial({map:texture});
+  // Must set this to true or the texture will not draw correctly if there is alpha 
+  mat.transparent = true;
+  // Make a new blank geometry 
+  var geom = new THREE.Geometry(); 
+  
+  // Add verticies to the geometry 
+  geom.vertices.push(new THREE.Vector3(0,0,0));
+  geom.vertices.push(new THREE.Vector3(0,height,0));
+  geom.vertices.push(new THREE.Vector3(width,height,0));
+  geom.vertices.push(new THREE.Vector3(width,0,0));
+  
+  // Set the geometry faces 
+  geom.faces.push(new THREE.Face3(0,1,2));
+  geom.faces.push(new THREE.Face3(2,3,0));
+
+  // Set the UV's for the faces 
+  if (texture != null){
+    geom.faceVertexUvs[0].push([
+      new THREE.Vector2(0,1),
+      new THREE.Vector2(0,0),
+      new THREE.Vector2(1,0)]);
+    geom.faceVertexUvs[0].push([
+      new THREE.Vector2(1,0),
+      new THREE.Vector2(1,1),
+      new THREE.Vector2(0,1)]);
+    geom.faces[0].normal.set(0,0,1); 
+  }
+
+  // Make the mesh 
+  return new THREE.Mesh(geom, mat);
+}
+
 /*==========================================*/
 /**           Text Renderer                 */
 /*==========================================*/
@@ -117,8 +140,6 @@ Hud.prototype.draw = function(renderer){
 var textScenes = [];
 // Length of each text 
 var textLengths = [];
-// Origins of text
-var textOrigins = [];
 // Standard text scale
 var textScale = 100;
 
@@ -127,8 +148,8 @@ Hud.prototype.drawText = function(x, y, size, text){
   // Scale to draw text at 
   var scale = size/textScale;
   // Current text offset 
-  var offsetx = textOrigins[intFromChar(text.charAt(i))].x * scale;
-  var offsety = -textOrigins[intFromChar(text.charAt(i))].y * scale;
+  var offsetx = 0;
+  var offsety = 0;
 
   // Draw text to screen
   for (var i = 0; i < text.length; i++){
@@ -187,96 +208,60 @@ function intFromChar(c){
 /** Initialize hud **/
 Hud.prototype.init = function(w, h){
   // Setup Camera 
-  this.camera = new THREE.OrthographicCamera( 0, w, h, 0, -1, 1);  
+  this.camera = new THREE.OrthographicCamera( 0, w, 0, h, 1, -1);  
   this.scene = new THREE.Scene();
 
   // Set level score location 
-  this.levelScoreLoc = {x: w/2, y: h - 40};
-  
-  /** Set up tut **/
-  var texture = THREE.ImageUtils.loadTexture( 'res/tut.png' );
-  var material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  material.transparent = true;
-  this.tutSprite  = new THREE.Sprite( material );
-  this.tutSprite.position.set( 170, h - 130, 0 );
-  this.tutSprite.scale.set( 319, 234, 1.0 );
-  this.scene.add( this.tutSprite  );
-  
-  /** Set up pause **/
-  texture = THREE.ImageUtils.loadTexture( 'res/paused.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  material.transparent = true;
-  this.pauseSprite  = new THREE.Sprite( material );
-  this.pauseSprite.position.set( w/2, h/2, 0 );
-  this.pauseSprite.scale.set( 300, 100, 1.0 );
-  this.scene.add( this.pauseSprite  );
+  this.levelScoreLoc = {x: w/2, y: 50};
   
   /** Setup gameover */
-  texture = THREE.ImageUtils.loadTexture( 'res/gameover.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  material.transparent = true;
-  material.opacity = 0;
-  this.gameoverSprite  = new THREE.Sprite( material );
-  this.gameoverSprite.position.set( w/2, h/2, 0 );
-  this.gameoverSprite.scale.set( 400, 150, 1.0 );
+  this.gameoverSprite = makeSprite(400, 150,'res/gameover.png' );
+  this.gameoverSprite.position.set( (w/2)-200, (h/2)-75, 0 );
+  this.gameoverSprite.material.opacity = 0;
   this.scene.add( this.gameoverSprite  );
   
   /** Setup warning */
-  texture = THREE.ImageUtils.loadTexture( 'res/warn.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  material.transparent = true;
-  material.opacity = 1;
-  this.warningSprite  = new THREE.Sprite( material );
-  this.warningSprite.position.set( w/2, h/2, 0 );
-  this.warningSprite.scale.set( 150, 75, 1.0 );
+  this.warningSprite = makeSprite(150, 75,'res/warn.png'  );
+  this.warningSprite.position.set( (w/2)-75, (h/2)-37.5, 0 );
+  this.warningSprite.material.opacity = 0;
   this.scene.add( this.warningSprite  );
   
   /** Shield **/
-  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_bar.png' );
-  material = new THREE.SpriteMaterial( { map: texture, color:0xFF0000} );
-  this.shieldBar  = new THREE.Sprite( material );
-  this.shieldBar.position.set( (w/2) - 60, h - 25, 0 );
-  this.shieldBar.scale.set( 100, 20, 1.0 );
+  this.shieldBar = makeSprite(100,20, 'res/hud_shield_bar.png' );
+  this.shieldBar.position.set( (w/2) - 120, 20, 0 );
+  this.shieldBar.material.color.setHex(0xFF0000);
   this.scene.add( this.shieldBar  );
   
-  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_outline.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  this.shieldOutline  = new THREE.Sprite( material );
-  this.shieldOutline.position.set( (w/2) - 60, h - 25, 0 );
-  this.shieldOutline.scale.set( 120, 40, 1.0 );
+  this.shieldOutline = makeSprite(120,40, 'res/hud_shield_outline.png' );
+  this.shieldOutline.position.set( (w/2) - 130, 10, 0 );
   this.scene.add( this.shieldOutline  );
 
   /** Fuel **/
-  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_bar.png' );
-  material = new THREE.SpriteMaterial( { map: texture, color:0x0000FF} );
-  this.fuelBar  = new THREE.Sprite( material );
-  this.fuelBar.position.set( (w/2) + 60, h - 25, 0 );
-  this.fuelBar.scale.set( 100, 20, 1.0 );
+  this.fuelBar = makeSprite(100,20, 'res/hud_shield_bar.png' );
+  this.fuelBar.position.set( (w/2) + 20, 20, 0 );
+  this.fuelBar.material.color.setHex(0x0000FF);
   this.scene.add( this.fuelBar  );
   
-  texture = THREE.ImageUtils.loadTexture( 'res/hud_shield_outline.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  this.fuelOutline  = new THREE.Sprite( material );
-  this.fuelOutline.position.set( (w/2) + 60, h - 25, 0 );
-  this.fuelOutline.scale.set( 120, 40, 1.0 );
+  this.fuelOutline = makeSprite(120,40, 'res/hud_shield_outline.png' );
+  this.fuelOutline.position.set( (w/2) + 10, 10, 0 );
   this.scene.add( this.fuelOutline  );
 
   /** Sound Toggle **/
-  texture = THREE.ImageUtils.loadTexture( 'res/sound_on.png' );
-  material = new THREE.SpriteMaterial( { map: texture } );
-  material.transparent = true;
-  this.soundOnSprite  = new THREE.Sprite( material );
-  this.soundOnSprite.position.set( 26,26, 0 );
-  this.soundOnSprite.scale.set( 52,52, 1.0 );
+  this.soundOnSprite = makeSprite(52,52, 'res/sound_on.png' );
   this.scene.add( this.soundOnSprite  );
 
-  texture = THREE.ImageUtils.loadTexture( 'res/sound_off.png' );
-  material = new THREE.SpriteMaterial( { map: texture } );
-  material.transparent = true;
-  this.soundOffSprite  = new THREE.Sprite( material );
-  this.soundOffSprite.position.set( 26,26, 0 );
-  this.soundOffSprite.scale.set( 52,52, 1.0 );
+  this.soundOffSprite = makeSprite(52,52, 'res/sound_off.png' );
   this.scene.add( this.soundOffSprite  );
+
+  /** Set up tut **/
+  this.tutSprite = makeSprite(500,400,'res/tutorial.png');
+  this.tutSprite.position.set((w/2)-250,(h/2)-200,0);
+  this.scene.add( this.tutSprite  );
+  
+  /** Set up pause **/
+  this.pauseSprite = makeSprite(300,100,'res/paused.png');
+  this.pauseSprite.position.set( (w/2)-150, (h/2) - 268, 0 );
+  this.scene.add( this.pauseSprite  );
 
   this.initText();
 }
@@ -295,88 +280,37 @@ Hud.prototype.initText = function(){
   textLengths[8] = 80;
   textLengths[9] = 80;
 
-  // Set origins 
-  textOrigins[0] = {x:38, y:51};
-  textOrigins[1] = {x:23, y:50};
-  textOrigins[2] = {x:36, y:50};
-  textOrigins[3] = {x:35, y:51};
-  textOrigins[4] = {x:39, y:50};
-  textOrigins[5] = {x:38, y:50};
-  textOrigins[6] = {x:38, y:51};
-  textOrigins[7] = {x:38, y:50};
-  textOrigins[8] = {x:38, y:51};
-  textOrigins[9] = {x:38, y:51};
-
   // Make text scenes
+  for (var i = 0; i < 10; i++) textScenes[i] = new THREE.Scene();
+
   // Number 0
-  var texture = THREE.ImageUtils.loadTexture( 'res/nums/num0.png' );
-  var material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  var sprite = new THREE.Sprite( material );
-  sprite.scale.set( 76,103, 1.0 );
-  textScenes[0] = new THREE.Scene();
+  var sprite = makeSprite(76,103,'res/nums/num0.png' );
   textScenes[0].add(sprite);
-
   // Number 1
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num1.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 47,100, 1.0 );
-  textScenes[1] = new THREE.Scene();
+  sprite = makeSprite(47,100,'res/nums/num1.png' );
   textScenes[1].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num2.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 72,101, 1.0 );
-  textScenes[2] = new THREE.Scene();
+  // Number 2
+  sprite = makeSprite(71,101,'res/nums/num2.png' );
   textScenes[2].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num3.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 71,102, 1.0 );
-  textScenes[3] = new THREE.Scene();
+  // Number 3
+  sprite = makeSprite(71,102,'res/nums/num3.png' );
   textScenes[3].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num4.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 79,101, 1.0 );
-  textScenes[4] = new THREE.Scene();
+  // Number 4
+  sprite = makeSprite(79,101,'res/nums/num4.png' );
   textScenes[4].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num5.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 76,101, 1.0 );
-  textScenes[5] = new THREE.Scene();
+  // Number 5
+  sprite = makeSprite(76,101,'res/nums/num5.png' );
   textScenes[5].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num6.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 77,103, 1.0 );
-  textScenes[6] = new THREE.Scene();
+  // Number 6
+  sprite = makeSprite(77,103,'res/nums/num6.png' );
   textScenes[6].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num7.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 76,100, 1.0 );
-  textScenes[7] = new THREE.Scene();
+  // Number 7
+  sprite = makeSprite(76,100,'res/nums/num7.png' );
   textScenes[7].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num8.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 76,103, 1.0 );
-  textScenes[8] = new THREE.Scene();
+  // Number 8
+  sprite = makeSprite(76,103,'res/nums/num8.png' );
   textScenes[8].add(sprite);
-
-  texture = THREE.ImageUtils.loadTexture( 'res/nums/num9.png' );
-  material = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: true} );
-  sprite = new THREE.Sprite( material );
-  sprite.scale.set( 76,103, 1.0 );
-  textScenes[9] = new THREE.Scene();
+  // Number 9
+  sprite = makeSprite(76,103,'res/nums/num9.png' );
   textScenes[9].add(sprite);
 }

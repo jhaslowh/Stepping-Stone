@@ -65,11 +65,11 @@ function addMouseEvents()
 {
   addEvent(document, "mousemove", function(e){
     mouse.x = e.clientX-renderer.domElement.getBoundingClientRect().left;
-    mouse.y = HEIGHT - e.clientY-renderer.domElement.getBoundingClientRect().top;
+    mouse.y = e.clientY-renderer.domElement.getBoundingClientRect().top;
     });
   addEvent(document, "mousedown", function(e){
     mouse.x = e.clientX-renderer.domElement.getBoundingClientRect().left;
-    mouse.y = HEIGHT - e.clientY-renderer.domElement.getBoundingClientRect().top;
+    mouse.y = e.clientY-renderer.domElement.getBoundingClientRect().top;
     if (e.button == 0 && mouse.left_down_old == false){
       mouse.left_down = true;
       mouse.down_x = mouse.x;
@@ -79,7 +79,7 @@ function addMouseEvents()
   
   addEvent(document, "mouseup", function(e){
     mouse.x = e.clientX-renderer.domElement.getBoundingClientRect().left;
-    mouse.y = HEIGHT - e.clientY-renderer.domElement.getBoundingClientRect().top;
+    mouse.y = e.clientY-renderer.domElement.getBoundingClientRect().top;
     if (e.button == 0){
       mouse.left_down = false;
     }
