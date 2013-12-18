@@ -26,17 +26,9 @@ var WIDTH = 0, HEIGHT = 0;
 
 // Beginning initialization 
 function init(){
-  initIO();
-  loadSounds();
-
-  
   // Window size 
   WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
         
-  // Set up level 
-  level.init(WIDTH,HEIGHT);
-  hud.init(WIDTH, HEIGHT);
-  debug.init();
   /** Setup renderer */
   // Create Renderer
   renderer = new THREE.WebGLRenderer();
@@ -53,6 +45,13 @@ function init(){
   
   document.body.appendChild(renderer.domElement);
   
+  // Set up game
+  level.init(WIDTH,HEIGHT);
+  hud.init(WIDTH, HEIGHT);
+  debug.init();
+  initIO();
+  loadSounds();
+
   /*var stats = new Stats();
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';

@@ -109,3 +109,15 @@ Currently the php script saves the highscore to a textfile. A future improvement
 would be to use a database to keep track of multiple scores. 
 
 
+Tested Browsers
+---------------
+
+OS | Browser | Version | Status 
+
+Windows 7 | Chrome | 31.0.1650.63 m | Working   
+Windows 7 | Firefox | 26.0 | Working  
+Windows 7 | Safari | 5.1.7 | Not Working  
+(Crashing in three.min.js)  
+Windows 7 | IE | 9 | Not Working  
+(Crashing in three.min.js & jquery-2.0.3.min.js)
+
