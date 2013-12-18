@@ -87,9 +87,9 @@ the grid. And finaly the grid of blocks is converted into level blocks that are
 then added to the levels' block list.   
 
 Points of Intrest:  
-Level.js, method generateChunk : Used to generate a block chunk  
-Level.js, method makeCorrectPath : Use to cute a path through the terrain
-Level.js, method gen_type6, gen_type7, gen_type9 : Methods used to generate virus chunks 
+* Level.js, method generateChunk : Used to generate a block chunk  
+* Level.js, method makeCorrectPath : Use to cute a path through the terrain
+* Level.js, method gen_type6, gen_type7, gen_type9 : Methods used to generate virus chunks 
 
 **A* Motion Planning**  
 The "Death Cube" in our game uses A* Pathfinding. When a Death Cube is made, it 
