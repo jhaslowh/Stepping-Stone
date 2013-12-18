@@ -181,8 +181,9 @@ Player.prototype.update = function(level){
     if (keyboard[KEY_SPACE] && this.shieldCurrentRecharge == this.shieldRecharge){
       this.shieldCurrentRecharge = 0;
       this.shieldCurrentTime = this.shieldTime;
-      shield_up_sound.play();
-      
+      if(PLAY_SOUNDS){
+        shield_up_sound.play();
+      }    
     }
 
     // Play a sound if the player tries to use the shiled before it is recharged
@@ -191,7 +192,9 @@ Player.prototype.update = function(level){
         //let the sound play a bit before restarting it
         shield_cooldown_sound.currentTime = 0;
       }
-      shield_cooldown_sound.play();
+      if(PLAY_SOUNDS){
+        shield_cooldown_sound.play();
+      }
     }
     
     // Update shield state 
@@ -199,7 +202,9 @@ Player.prototype.update = function(level){
       this.shieldCurrentTime -= time_step;
       if (this.shieldCurrentTime < 0){
         this.shieldCurrentTime = 0;
-        shield_down_sound.play();
+        if(PLAY_SOUNDS){
+          shield_down_sound.play();
+        }
       }
     }
     else if (this.shieldCurrentRecharge != this.shieldRecharge){
@@ -330,6 +335,8 @@ Player.prototype.hitCeiling = function(){
 Player.prototype.hitWater = function(){
   // Play splash sound 
   if (PLAY_SOUNDS){
+    console.log(this.air_t);
+
     splash_sound.volume = this.air_t; // Volume depends on how long the player falls. Volume maxes when air_t is =>1
     splash_sound.currentTime = 0;
     splash_sound.play();
@@ -371,3 +378,4 @@ Player.prototype.checkBlockBoth = function(block){
     (block.x + block.width) < this.nx ||
     block.x > (this.nx + this.w));
 }
+
