@@ -1,8 +1,5 @@
-CS 425 Final Project
+CS 425 Final Project: Stepping Stone
 ====================
-
-Stepping Stone
-==============
 
 Project Description
 -------------------
@@ -35,7 +32,8 @@ File Descriptions
 * Level.js :: This is the main gameplay file. Level contains the level structure and all the objects needed to play a game. Level also will call all the update and draw functions for all of the other objects in the game. 
 * Player.js :: Contains the player objects and all code needed to make the player work. 
 * Sound.js :: Controls sound for the game. 
-* three.js :: Necessary 3D library for the project. 
+* three.js :: Necessary 3D library for the project.
+* jquery-2.0.3.min.js ::  [jquery](http://jquery.com) library used to make the prompt for user name look better.
 
 Controls
 --------
