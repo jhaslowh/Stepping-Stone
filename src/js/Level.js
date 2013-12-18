@@ -181,7 +181,7 @@ function game_over_run_once(score){
   //TODO this is inelegant. Can we stop calls to gameover once the game is over?
   if(!this.gameover_ran){
     this.gameover_ran = true;
-    var player_name = prompt("Player Name:","Default Name");
+    player_name = prompt("Player Name:","Default Name");
     if(player_name==null){
       player_name = "null";
     }

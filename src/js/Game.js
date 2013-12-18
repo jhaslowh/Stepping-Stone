@@ -3,6 +3,7 @@
 // Input 
 var keyboard = {};
 var keyboard_old = {};
+var player_name = "Default Name";
 var mouse = {
   x:0, 
   y:0, 
