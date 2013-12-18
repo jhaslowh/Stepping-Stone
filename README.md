@@ -70,6 +70,9 @@ Project Technical Information
 
 Hit the '~' key to enable the Debug menu. 
 
+This project was tested on Chrome and Firefox. Internet Explorer was not tested
+against.
+
 **Procedural Generation**  
 Level terrain is generated in chunks. Each chunk is n blocks long and m blocks 
 high. The first step of generation is the terrain grid is filled with blocks. 
