@@ -1,4 +1,27 @@
-<?php 
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Steppiing Stone: Highscore</title>
+<style>
+
+	body
+	{
+	background-image:url('background.png');
+	background-color:#2222ff;
+	} 
+
+	.center
+	{
+	margin:auto;
+	width:25%;
+	background-color:#ffffff;
+	}
+</style>
+</head>
+
+<body>
+
+<div class="center"><?php 
 error_reporting(E_ALL |E_STRICT);
 
 $score_file = 'highscore.txt';
@@ -15,3 +38,11 @@ echo " by " ;
 echo $current_highscore_holder;
 
 ?>
+</div>
+
+</body>
+</html> 
+
+
+
+
