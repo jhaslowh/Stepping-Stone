@@ -34,39 +34,8 @@ While you are above water, you can jump and climb on ceilings. To jump just
 press 'W' while above water. And to stick to a ceiling, hold 'W' when you hit a
 ceiling. 
 
-
-File Descriptions
------------------
-
-* Blocks.js :: Holds the basic structure for each block Also Handles drawing for each block.
-* Debug.js :: Adds some debugging features to make showing the game in class easier.  
-* Game.js :: This is the main file for the game. It handles all of the I/O and also the game loop. 
-* Hud.js :: Does 2D screen drawing for the game. 
-* IO.js :: I/O File for the game. Handles keyboard and mouse. 
-* Level.js :: This is the main gameplay file. Level contains the level structure and all the objects needed to play a game. Level also will call all the update and draw functions for all of the other objects in the game. 
-* Player.js :: Contains the player objects and all code needed to make the player work. 
-* Sound.js :: Controls sound for the game. 
-* three.js :: Necessary 3D library for the project.
-* jquery-2.0.3.min.js ::  [jquery](http://jquery.com) library used to make the prompt for user name look better.
-
-Controls
---------
-
-WASD  : Move the player  
-Q & E : Rotate the camera  
-Space : Activate Shield  
-R     : Restart game  
-P     : Pause game
-
-Sounds
-------
-
-* [Slime Splash Sound](http://soundbible.com/1097-Slime-Splash.html) by Mike Koenig
-* [Laser Cannon Sound](http://soundbible.com/1771-Laser-Cannon.html) by Mike Koenig
-* [Computer Error Sound](http://soundbible.com/172-Computer-Error.html) by Mike Koenig
-
-Project Technical Information
------------------------------
+Technical Information
+---------------------
 
 Hit the '~' key to enable the Debug menu. 
 
@@ -106,8 +75,37 @@ Blocks.js, function findPath : Uses A* to find a path from startLoc to the goalL
 A small amount of AJAX is used to send player scores to the server. You can
 view [the highscore](http://www.divided-games.com/CS425/php/highscore.php). 
 Currently the php script saves the highscore to a textfile. A future improvement
-would be to use a database to keep track of multiple scores. 
+would be to use a database to keep track of multiple scores.  
 
+File Descriptions
+-----------------
+
+* Blocks.js :: Holds the basic structure for each block Also Handles drawing for each block.
+* Debug.js :: Adds some debugging features to make showing the game in class easier.  
+* Game.js :: This is the main file for the game. It handles all of the I/O and also the game loop. 
+* Hud.js :: Does 2D screen drawing for the game. 
+* IO.js :: I/O File for the game. Handles keyboard and mouse. 
+* Level.js :: This is the main gameplay file. Level contains the level structure and all the objects needed to play a game. Level also will call all the update and draw functions for all of the other objects in the game. 
+* Player.js :: Contains the player objects and all code needed to make the player work. 
+* Sound.js :: Controls sound for the game. 
+* three.js :: Necessary 3D library for the project.
+* jquery-2.0.3.min.js ::  [jquery](http://jquery.com) library used to make the prompt for user name look better.
+
+Controls
+--------
+
+WASD  : Move the player  
+Q & E : Rotate the camera  
+Space : Activate Shield  
+R     : Restart game  
+P     : Pause game
+
+Sounds
+------
+
+* [Slime Splash Sound](http://soundbible.com/1097-Slime-Splash.html) by Mike Koenig
+* [Laser Cannon Sound](http://soundbible.com/1771-Laser-Cannon.html) by Mike Koenig
+* [Computer Error Sound](http://soundbible.com/172-Computer-Error.html) by Mike Koenig  
 
 Tested Browsers
 ---------------
