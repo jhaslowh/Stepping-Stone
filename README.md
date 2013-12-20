@@ -1,4 +1,4 @@
-CS 425 Final Project: Stepping Stone
+Stepping Stone
 ====================
 
 Project Description
