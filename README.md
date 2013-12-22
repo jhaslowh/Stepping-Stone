@@ -10,8 +10,8 @@ Members:
 Jonathan Haslow-Hall  
 James Dressel  
 
-[Play latest version here.](http://www.divided-games.com/CS425/index.html)  
-[View Highscore Data](http://www.divided-games.com/CS425/php/highscore.php)
+[Play latest version here.](http://www.divided-games.com/Apps/SteppingStone/index.html)  
+[View Highscore Data](http://www.divided-games.com/Apps/SteppingStone/php/highscore.php)
 
 Game Description & How to play
 ------------------------------
@@ -73,7 +73,7 @@ Blocks.js, function findPath : Uses A* to find a path from startLoc to the goalL
 
 **AJAX**  
 A small amount of AJAX is used to send player scores to the server. You can
-view [the highscore](http://www.divided-games.com/CS425/php/highscore.php). 
+view [the highscore](http://www.divided-games.com/Apps/SteppingStone/php/highscore.php). 
 Currently the php script saves the highscore to a textfile. A future improvement
 would be to use a database to keep track of multiple scores.  
 

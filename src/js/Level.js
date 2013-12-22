@@ -187,7 +187,7 @@ function game_over_run_once(score){
     }
     var intscore = Math.floor(score);//PHP code currently only supports ints
     var xmlhttp =new XMLHttpRequest(); //We don't support IE6
-    var url_string = "http://www.divided-games.com/CS425/php/post_score.php?name=" + player_name + "&score=" + intscore;
+    var url_string = "http://www.divided-games.com/Apps/SteppingStone/php/post_score.php?name=" + player_name + "&score=" + intscore;
     xmlhttp.open("GET",url_string,true);
     xmlhttp.send();
   }
